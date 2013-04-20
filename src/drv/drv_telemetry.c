@@ -60,16 +60,22 @@ volatile uint8_t rx1Buffer[UART1_BUFFER_SIZE];
 uint32_t rx1DMAPos = 0;
 
 volatile uint8_t tx1Buffer[UART1_BUFFER_SIZE];
-uint16_t tx1BufferTail = 0;
-uint16_t tx1BufferHead = 0;
+volatile uint16_t tx1BufferTail = 0;
+volatile uint16_t tx1BufferHead = 0;
+
+volatile uint8_t  tx1DmaEnabled = false;
 
 ///////////////////////////////////////////////////////////////////////////////
 // UART1 Transmit via DMA
 ///////////////////////////////////////////////////////////////////////////////
 
-static void UART1TxDMA(void)
+static void uart1TxDMA(void)
 {
+    if (tx1DmaEnabled == true)
+        return;
+
     DMA2_Stream7->M0AR = (uint32_t)&tx1Buffer[tx1BufferTail];
+
     if (tx1BufferHead > tx1BufferTail)
     {
 	    DMA_SetCurrDataCounter(DMA2_Stream7, tx1BufferHead - tx1BufferTail);
@@ -81,6 +87,8 @@ static void UART1TxDMA(void)
 	    tx1BufferTail = 0;
     }
 
+    tx1DmaEnabled = true;
+
     DMA_Cmd(DMA2_Stream7, ENABLE);
 }
 
@@ -91,10 +99,11 @@ static void UART1TxDMA(void)
 void DMA2_Stream7_IRQHandler(void)
 {
     DMA_ClearITPendingBit(DMA2_Stream7, DMA_IT_TCIF7);
-    DMA_Cmd(DMA2_Stream7, DISABLE);
+
+    tx1DmaEnabled = false;
 
     if (tx1BufferHead != tx1BufferTail)
-	    UART1TxDMA();
+	    uart1TxDMA();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -246,12 +255,7 @@ void telemetryWrite(uint8_t ch)
     tx1Buffer[tx1BufferHead] = ch;
     tx1BufferHead = (tx1BufferHead + 1) % UART1_BUFFER_SIZE;
 
-    // if DMA wasn't enabled, fire it up
-    if (DMA_GetCmdStatus(DMA2_Stream7) == DISABLE)
-    {
-    	UART1TxDMA();
-    	delayMicroseconds(100);
-    }
+    uart1TxDMA();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -261,7 +265,29 @@ void telemetryWrite(uint8_t ch)
 void telemetryPrint(char *str)
 {
     while (*str)
-	   telemetryWrite(*(str++));
+    {
+    	tx1Buffer[tx1BufferHead] = *str++;
+    	tx1BufferHead = (tx1BufferHead + 1) % UART1_BUFFER_SIZE;
+    }
+
+	uart1TxDMA();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Telemetry Print Formatted - Print formatted string to Telemetry Port
+// From Ala42
+///////////////////////////////////////////////////////////////////////////////
+
+void telemetryPrintF(const char * fmt, ...)
+{
+	char buf[256];
+
+	va_list  vlist;
+	va_start (vlist, fmt);
+
+	vsnprintf(buf, sizeof(buf), fmt, vlist);
+	telemetryPrint(buf);
+	va_end(vlist);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

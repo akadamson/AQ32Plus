@@ -33,7 +33,11 @@ _Min_Stack_Size = 0x400; /* required amount of stack */
 MEMORY
 {
   VECTOR (rx)     : ORIGIN = 0x08000000, LENGTH =  16K		/* Interrupt vector space */
+<<<<<<< HEAD
   EEPROM (rx)     : ORIGIN = 0x08004000, LENGTH =  16K		/* Pseudo eeprom space */
+=======
+  EEPROM (rx)     : ORIGIN = 0x08004000, LENGTH =  16K		/* Emulated eeprom space */
+>>>>>>> upstream/master
   FLASH  (rx)     : ORIGIN = 0x08008000, LENGTH = 992K		/* Main Embedded FlashROM */
   SRAM	 (xrw)	  : ORIGIN = 0x40024000, LENGTH =   4K		/* Backuped SRAM */
   RAM    (xrw)    : ORIGIN = 0x20000000, LENGTH = 112K		/* Main Embedded SRAM */

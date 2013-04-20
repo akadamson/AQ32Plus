@@ -41,17 +41,15 @@
 #define     PI 3.14159265f
 #define TWO_PI 6.28318531f
 
-#define D2R PI / 180.0f
+#define D2R (PI / 180.0f)
 
-#define R2D 180.0f / PI
+#define R2D (180.0f / PI)
 
 #define KNOTS2MPS 0.51444444f
 
 #define EARTH_RADIUS 6371000f
 
-#define SQR(x)  x * x
-
-extern char numberString[32];
+#define SQR(x)  (x * x)
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -345,7 +343,8 @@ typedef struct eepromConfig_t
 
     ///////////////////////////////////
 
-    uint8_t gpsType;
+    uint8_t  gpsType;
+    uint16_t gpsBaudRate;
 
     ///////////////////////////////////
 
@@ -354,6 +353,11 @@ typedef struct eepromConfig_t
     ///////////////////////////////////
 
     float   batteryVoltageDivider;
+
+    ///////////////////////////////////
+
+    uint8_t armCount;
+    uint8_t disarmCount;
 
     ///////////////////////////////////
 
