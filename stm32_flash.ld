@@ -35,7 +35,7 @@ MEMORY
   VECTOR (rx)     : ORIGIN = 0x08000000, LENGTH =  16K		/* Interrupt vector space */
   EEPROM (rx)     : ORIGIN = 0x08004000, LENGTH =  16K		/* Emulated eeprom space */
   FLASH  (rx)     : ORIGIN = 0x08008000, LENGTH = 992K		/* Main Embedded FlashROM */
-  SRAM	 (xrw)	  : ORIGIN = 0x40024000, LENGTH =   4K		/* Backuped SRAM */
+  SRAM	 (xrw)	  : ORIGIN = 0x40024000, LENGTH =   4K		/* Backed up SRAM */
   RAM    (xrw)    : ORIGIN = 0x20000000, LENGTH = 112K		/* Main Embedded SRAM */
   RAM1   (xrw)	  : ORIGIN = 0x2001C000, LENGTH =  16K		/* Etheret & USB Specific Embedded SRAM */
   CCM	 (xrw)	  : ORIGIN = 0x10000000, LENGTH =  64K		/* Core-Coupled SRAM */
