@@ -155,10 +155,10 @@ void PendSV_Handler(void)
   * @param  None
   * @retval None
   */
-// AKA void SysTick_Handler(void)
-// AKA {
-// AKA  TimingDelay_Decrement();
-// AKA }
+// HJI void SysTick_Handler(void)
+// HJI {
+// HJI   TimingDelay_Decrement();
+// HJI }
 
 //HJI
 #ifdef USE_USB_OTG_FS
