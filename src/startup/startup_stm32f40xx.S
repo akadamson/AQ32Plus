@@ -112,8 +112,9 @@ LoopFillZerobss:
 /* Call the application's entry point.*/
   bl  main
   bx  lr    
-  
+
 /******************************************************/
+
 .equ	RCC_AHB1ENR,	    0x40023830  // HJI 4/26/2013
 .equ	GPIOE_CLK_MASK,	    0x00000010  // HJI 4/26/2013
 

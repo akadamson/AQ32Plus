@@ -32,21 +32,6 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx.h"
 
-// AKA
-/*
-#if defined (USE_STM324xG_EVAL)
-  #include "stm324xg_eval.h"
-  #include "stm324xg_eval_lcd.h"
-
-#elif defined (USE_STM324x7I_EVAL) 
-  #include "stm324x7i_eval.h"
-  #include "stm324x7i_eval_lcd.h"
-
-#else
- #error "Please select first the Evaluation board used in your application (in Project Options)"
-#endif
-*/
-// AKA
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
