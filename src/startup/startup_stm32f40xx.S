@@ -70,12 +70,12 @@ defined in linker script */
   .weak  Reset_Handler
   .type  Reset_Handler, %function
 Reset_Handler:  
-	ldr	r0, =0x2001FFFC         // HJI 3/20/2012
-	ldr	r1, =0xDEADBEEF         // HJI 3/20/2012
-	ldr	r2, [r0, #0]            // HJI 3/20/2012
-	str	r0, [r0, #0]            // HJI 3/20/2012
-	cmp	r2, r1                  // HJI 3/20/2012
-	beq	Reboot_Loader           // HJI 3/20/2012
+  ldr	r0, =0x2001FFFC         // HJI 4/26/2013
+  ldr	r1, =0xDEADBEEF         // HJI 4/26/2013
+  ldr	r2, [r0, #0]            // HJI 4/26/2013
+  str	r0, [r0, #0]            // HJI 4/26/2013
+  cmp	r2, r1                  // HJI 4/26/2013
+  beq	Reboot_Loader           // HJI 4/26/2013
 
 /* Copy the data segment initializers from flash to SRAM */  
   movs  r1, #0
@@ -113,53 +113,54 @@ LoopFillZerobss:
   bl  main
   bx  lr    
   
-.equ	RCC_AHB1ENR,	    0x40023830  // HJI 3/20/2012
-.equ	GPIOE_CLK_MASK,	    0x00000010  // HJI 7/27/2012
+/******************************************************/
+.equ	RCC_AHB1ENR,	    0x40023830  // HJI 4/26/2013
+.equ	GPIOE_CLK_MASK,	    0x00000010  // HJI 4/26/2013
 
-.equ    GPIOE_MODER,        0x40021000  // HJI 7/27/2012
-.equ    GPIOE_MODE_MASK,    0x00001400  // HJI 7/27/2012
+.equ    GPIOE_MODER,        0x40021000  // HJI 4/26/2013
+.equ    GPIOE_MODE_MASK,    0x00001400  // HJI 4/26/2013
 
-.equ    GPIOE_OTYPER,       0x40021004  // HJI 7/27/2012
-.equ    GPIOE_OTYPE_MASK,   0x00000000  // HJI 7/27/2012
+.equ    GPIOE_OTYPER,       0x40021004  // HJI 4/26/2013
+.equ    GPIOE_OTYPE_MASK,   0x00000000  // HJI 4/26/2013
 
-.equ    GPIOE_OSPEEDR,      0x40021008  // HJI 7/27/2012
-.equ    GPIOE_OSPEED_MASK,  0x00002800  // HJI 7/27/2012
+.equ    GPIOE_OSPEEDR,      0x40021008  // HJI 4/26/2013
+.equ    GPIOE_OSPEED_MASK,  0x00002800  // HJI 4/26/2013
 
-.equ    GPIOE_ODR,          0x40021014  // HJI 7/27/2012
-.equ    GPIOE_OD_MASK,      0x00000060  // HJI 7/27/2012
+.equ    GPIOE_ODR,          0x40021014  // HJI 4/26/2013
+.equ    GPIOE_OD_MASK,      0x00000060  // HJI 4/26/2013
 
-Reboot_Loader:                          // HJI 3/20/2012
+Reboot_Loader:                          // HJI 4/26/2013
 
-        // RCC Enable GPIOE Clock       // HJI 7/27/2012
-        ldr     r6, =RCC_AHB1ENR        // HJI 3/20/2012
-        ldr     r0, =GPIOE_CLK_MASK     // HJI 7/27/2012
-        str     r0, [r6];               // HJI 3/20/2012
+  // RCC Enable GPIOE Clock             // HJI 4/26/2013
+  ldr     r6, =RCC_AHB1ENR              // HJI 4/26/2013
+  ldr     r0, =GPIOE_CLK_MASK           // HJI 4/26/2013
+  str     r0, [r6];                     // HJI 4/26/2013
         
-        // Set GPIOE 5 & 6 as Outputs   // HJI 7/27/2012
-        ldr     r6, =GPIOE_MODER        // HJI 7/27/2012
-        ldr     r0, =GPIOE_MODE_MASK    // HJI 7/27/2012
-        str     r0, [r6]                // HJI 3/20/2012
+  // Set GPIOE 5 & 6 as Outputs         // HJI 4/26/2013
+  ldr     r6, =GPIOE_MODER              // HJI 4/26/2013
+  ldr     r0, =GPIOE_MODE_MASK          // HJI 4/26/2013
+  str     r0, [r6]                      // HJI 4/26/2013
         
-        // Set GPIOE 5 & 6 as Push-Pull // HJI 7/27/2012
-        ldr     r6, =GPIOE_OTYPER       // HJI 7/27/2012
-        ldr     r0, =GPIOE_OTYPE_MASK   // HJI 7/27/2012
-        str     r0, [r6]                // HJI 3/20/2012
+  // Set GPIOE 5 & 6 as Push-Pull       // HJI 4/26/2013
+  ldr     r6, =GPIOE_OTYPER             // HJI 4/26/2013
+  ldr     r0, =GPIOE_OTYPE_MASK         // HJI 4/26/2013
+  str     r0, [r6]                      // HJI 4/26/2013
         
-        // Set GPIOE 5 & 6 at 50 MHz    // HJI 7/27/2012
-        ldr     r6, =GPIOE_OSPEEDR      // HJI 7/27/2012
-        ldr     r0, =GPIOE_OSPEED_MASK  // HJI 7/27/2012
-        str     r0, [r6]                // HJI 3/20/2012
+  // Set GPIOE 5 & 6 at 50 MHz          // HJI 4/26/2013
+  ldr     r6, =GPIOE_OSPEEDR            // HJI 4/26/2013
+  ldr     r0, =GPIOE_OSPEED_MASK        // HJI 4/26/2013
+  str     r0, [r6]                      // HJI 4/26/2013
         
-        // Set GPIOE 5 & 6 High         // HJI 7/27/2012
-        ldr     r6, =GPIOE_ODR          // HJI 7/27/2012
-        ldr     r0, =GPIOE_OD_MASK      // HJI 7/27/2012
-        str     r0, [r6]                // HJI 3/20/2012
+  // Set GPIOE 5 & 6 High               // HJI 4/26/2013
+  ldr     r6, =GPIOE_ODR                // HJI 4/26/2013
+  ldr     r0, =GPIOE_OD_MASK            // HJI 4/26/2013
+  str     r0, [r6]                      // HJI 4/26/2013
         
-        // Reboot to ROM                // HJI 3/20/2012
-        ldr     r0, =0x1FFF0000         // HJI 3/20/2012
-        ldr     sp,[r0, #0]             // HJI 3/20/2012
-        ldr     r0,[r0, #4]             // HJI 3/20/2012
-        bx      r0                      // HJI 3/20/2012
+  // Reboot to ROM                      // HJI 4/26/2013
+  ldr     r0, =0x1FFF0000               // HJI 4/26/2013
+  ldr     sp,[r0, #0]                   // HJI 4/26/2013
+  ldr     r0,[r0, #4]                   // HJI 4/26/2013
+  bx      r0                            // HJI 4/26/2013
         
 .size  Reset_Handler, .-Reset_Handler
 

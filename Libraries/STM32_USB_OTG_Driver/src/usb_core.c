@@ -1961,7 +1961,10 @@ void USB_OTG_ActiveRemoteWakeup(USB_OTG_CORE_HANDLE *pdev)
       if(pdev->cfg.low_power)
       {
         /* un-gate USB Core clock */
+        #pragma GCC diagnostic push                           // HJI
+		    #pragma GCC diagnostic ignored "-Wstrict-aliasing"    // HJI
         power.d32 = USB_OTG_READ_REG32(&pdev->regs.PCGCCTL);
+        #pragma GCC diagnostic pop                            // HJI
         power.b.gatehclk = 0;
         power.b.stoppclk = 0;
         USB_OTG_WRITE_REG32(pdev->regs.PCGCCTL, power.d32);

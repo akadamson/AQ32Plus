@@ -352,7 +352,14 @@ static uint32_t DCD_HandleResume_ISR(USB_OTG_CORE_HANDLE *pdev)
   if(pdev->cfg.low_power)
   {
     /* un-gate USB Core clock */
+
+  #pragma GCC diagnostic push                           // HJI
+	#pragma GCC diagnostic ignored "-Wstrict-aliasing"    // HJI
+
     power.d32 = USB_OTG_READ_REG32(&pdev->regs.PCGCCTL);
+
+	#pragma GCC diagnostic pop                            // HJI
+
     power.b.gatehclk = 0;
     power.b.stoppclk = 0;
     USB_OTG_WRITE_REG32(pdev->regs.PCGCCTL, power.d32);
@@ -642,6 +649,7 @@ static uint32_t DCD_WriteEmptyTxFifo(USB_OTG_CORE_HANDLE *pdev, uint32_t epnum)
   uint32_t len = 0;
   uint32_t len32b;
   txstatus.d32 = 0;
+  uint32_t fifoemptymsk;  // HJI Patch from STM Forum, Tags: usb vcp stm32_usb-s-device_lib
   
   ep = &pdev->dev.in_ep[epnum];    
   
@@ -677,7 +685,7 @@ static uint32_t DCD_WriteEmptyTxFifo(USB_OTG_CORE_HANDLE *pdev, uint32_t epnum)
     
     if( ep->xfer_count >= ep->xfer_len)                                      // HJI Patch from STM Forum, Tags: usb vcp stm32_usb-s-device_lib
     {                                                                        // HJI Patch from STM Forum, Tags: usb vcp stm32_usb-s-device_lib
-      uint32_t fifoemptymsk = 1 << ep->num;                                  // HJI Patch from STM Forum, Tags: usb vcp stm32_usb-s-device_lib
+      fifoemptymsk = 1 << ep->num;                                           // HJI Patch from STM Forum, Tags: usb vcp stm32_usb-s-device_lib
       USB_OTG_MODIFY_REG32(&pdev->regs.DREGS->DIEPEMPMSK, fifoemptymsk, 0);  // HJI Patch from STM Forum, Tags: usb vcp stm32_usb-s-device_lib
       break;                                                                 // HJI Patch from STM Forum, Tags: usb vcp stm32_usb-s-device_lib
     }                                                                        // HJI Patch from STM Forum, Tags: usb vcp stm32_usb-s-device_lib
