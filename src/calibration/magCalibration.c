@@ -46,16 +46,16 @@ uint8_t magCalibrating = false;
 
 void magCalibration(I2C_TypeDef *I2Cx)
 {
-	uint16_t calibrationCounter = 0;
-	uint16_t population[2][3];
+    uint16_t calibrationCounter = 0;
+    uint16_t population[2][3];
 
-	float    d[600][3];       // 600 Samples = 60 seconds of data at 10 Hz
-	float    sphereOrigin[3];
-	float    sphereRadius;
+    float    d[600][3];       // 600 Samples = 60 seconds of data at 10 Hz
+    float    sphereOrigin[3];
+    float    sphereRadius;
 
-	magCalibrating = true;
+    magCalibrating = true;
 
-	cliPrint("\nMagnetometer Calibration:\n\n");
+    cliPrint("\nMagnetometer Calibration:\n\n");
 
     cliPrint("Rotate magnetometer around all axes multiple times\n");
     cliPrint("Must complete within 60 seconds....\n\n");
@@ -68,30 +68,30 @@ void magCalibration(I2C_TypeDef *I2Cx)
     cliRead();
 
     while ((cliAvailable() == false) && (calibrationCounter <= 3000))
-	{
-		if (readMag(I2Cx) == true)
-		{
-			d[calibrationCounter][XAXIS] = (float)rawMag[XAXIS].value * magScaleFactor[XAXIS];
-			d[calibrationCounter][YAXIS] = (float)rawMag[YAXIS].value * magScaleFactor[YAXIS];
-			d[calibrationCounter][ZAXIS] = (float)rawMag[ZAXIS].value * magScaleFactor[ZAXIS];
+    {
+        if (readMag(I2Cx) == true)
+        {
+            d[calibrationCounter][XAXIS] = (float)rawMag[XAXIS].value * magScaleFactor[XAXIS];
+            d[calibrationCounter][YAXIS] = (float)rawMag[YAXIS].value * magScaleFactor[YAXIS];
+            d[calibrationCounter][ZAXIS] = (float)rawMag[ZAXIS].value * magScaleFactor[ZAXIS];
 
-			calibrationCounter++;
-		}
+            calibrationCounter++;
+        }
 
-		delay(100);
-	}
+        delay(100);
+    }
 
-	cliRead();
+    cliRead();
 
-	cliPrintF("\n\nMagnetometer Bias Calculation, %3ld samples collected out of 600 max)\n", calibrationCounter);
+    cliPrintF("\n\nMagnetometer Bias Calculation, %3ld samples collected out of 600 max)\n", calibrationCounter);
 
-	sphereFit(d, calibrationCounter, 100, 0.0f, population, sphereOrigin, &sphereRadius);
+    sphereFit(d, calibrationCounter, 100, 0.0f, population, sphereOrigin, &sphereRadius);
 
-	eepromConfig.magBias[XAXIS] = sphereOrigin[XAXIS];
-	eepromConfig.magBias[YAXIS] = sphereOrigin[YAXIS];
-	eepromConfig.magBias[ZAXIS] = sphereOrigin[ZAXIS];
+    eepromConfig.magBias[XAXIS] = sphereOrigin[XAXIS];
+    eepromConfig.magBias[YAXIS] = sphereOrigin[YAXIS];
+    eepromConfig.magBias[ZAXIS] = sphereOrigin[ZAXIS];
 
-	magCalibrating = false;
+    magCalibrating = false;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

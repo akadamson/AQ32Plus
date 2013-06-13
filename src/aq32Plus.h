@@ -39,7 +39,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #ifndef PI
-    #define PI  3.14159265358979f
+#define PI  3.14159265358979f
 #endif
 
 #define TWO_PI (2.0f * PI)
@@ -77,24 +77,28 @@
 // Misc Type Definitions
 ///////////////////////////////////////////////////////////////////////////////
 
-typedef union {
+typedef union
+{
     int16_t value;
     uint8_t bytes[2];
 } int16andUint8_t;
 
-typedef union {
+typedef union
+{
     int32_t value;
     uint8_t bytes[4];
 } int32andUint8_t;
 
-typedef union {
+typedef union
+{
     uint16_t value;
-     uint8_t bytes[2];
+    uint8_t bytes[2];
 } uint16andUint8_t;
 
-typedef union {
-	uint32_t value;
-	 uint8_t bytes[4];
+typedef union
+{
+    uint32_t value;
+    uint8_t bytes[4];
 } uint32andUint8_t;
 
 ///////////////////////////////////////
@@ -112,6 +116,7 @@ typedef struct sensors_t
     float    attitude500Hz[3];
     float    gyro500Hz[3];
     float    mag10Hz[3];
+    //    uint32_t ipress;
     float    pressureAlt50Hz;
 
     float    accel500HzMXR[3];
@@ -133,8 +138,8 @@ extern sensors_t sensors;
 
 typedef struct heading_t
 {
-	float    mag;
-	float    tru;
+    float    mag;
+    float    tru;
 } heading_t;
 
 extern heading_t heading;

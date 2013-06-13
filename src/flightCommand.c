@@ -78,9 +78,9 @@ void processFlightCommands(void)
 {
     uint8_t channel;
 
-    if ( rcActive == true )
+    if (rcActive == true)
     {
-		// Read receiver commands
+        // Read receiver commands
         for (channel = 0; channel < 8; channel++)
             rxCommand[channel] = (float)rxRead(eepromConfig.rcMap[channel]);
 
@@ -97,142 +97,143 @@ void processFlightCommands(void)
 
     // Set past command in detent values
     for (channel = 0; channel < 3; channel++)
-    	previousCommandInDetent[channel] = commandInDetent[channel];
+        previousCommandInDetent[channel] = commandInDetent[channel];
 
     // Apply deadbands and set detent discretes'
     for (channel = 0; channel < 3; channel++)
     {
-    	if ((rxCommand[channel] <= DEADBAND) && (rxCommand[channel] >= -DEADBAND))
+        if ((rxCommand[channel] <= DEADBAND) && (rxCommand[channel] >= -DEADBAND))
         {
             rxCommand[channel] = 0;
-  	        commandInDetent[channel] = true;
-  	    }
+            commandInDetent[channel] = true;
+        }
         else
-  	    {
-  	        commandInDetent[channel] = false;
-  	        if (rxCommand[channel] > 0)
-  	        {
-  		        rxCommand[channel] = (rxCommand[channel] - DEADBAND) * DEADBAND_SLOPE;
-  	        }
-  	        else
-  	        {
-  	            rxCommand[channel] = (rxCommand[channel] + DEADBAND) * DEADBAND_SLOPE;
-  	        }
+        {
+            commandInDetent[channel] = false;
+
+            if (rxCommand[channel] > 0)
+            {
+                rxCommand[channel] = (rxCommand[channel] - DEADBAND) * DEADBAND_SLOPE;
+            }
+            else
+            {
+                rxCommand[channel] = (rxCommand[channel] + DEADBAND) * DEADBAND_SLOPE;
+            }
         }
     }
 
     ///////////////////////////////////
 
     // Check for low throttle
-    if ( rxCommand[THROTTLE] < eepromConfig.minCheck )
+    if (rxCommand[THROTTLE] < eepromConfig.minCheck)
     {
-		// Check for disarm command ( low throttle, left yaw )
-		if ( (rxCommand[YAW] < (eepromConfig.minCheck - MIDCOMMAND)) && (armed == true) )
-		{
-			disarmingTimer++;
+        // Check for disarm command ( low throttle, left yaw )
+        if ((rxCommand[YAW] < (eepromConfig.minCheck - MIDCOMMAND)) && (armed == true))
+        {
+            disarmingTimer++;
 
-			if (disarmingTimer > eepromConfig.disarmCount)
-			{
-				zeroPIDintegralError();
-			    zeroPIDstates();
-			    armed = false;
-			    disarmingTimer = 0;
-			}
-		}
-		else
-		{
-			disarmingTimer = 0;
-		}
+            if (disarmingTimer > eepromConfig.disarmCount)
+            {
+                zeroPIDintegralError();
+                zeroPIDstates();
+                armed = false;
+                disarmingTimer = 0;
+            }
+        }
+        else
+        {
+            disarmingTimer = 0;
+        }
 
-		// Check for gyro bias command ( low throttle, left yaw, aft pitch, right roll )
-		if ( (rxCommand[YAW  ] < (eepromConfig.minCheck - MIDCOMMAND)) &&
-		     (rxCommand[ROLL ] > (eepromConfig.maxCheck - MIDCOMMAND)) &&
-		     (rxCommand[PITCH] < (eepromConfig.minCheck - MIDCOMMAND)) )
-		{
-			computeMPU6000RTData();
-			pulseMotors(3);
-		}
+        // Check for gyro bias command ( low throttle, left yaw, aft pitch, right roll )
+        if ((rxCommand[YAW  ] < (eepromConfig.minCheck - MIDCOMMAND)) &&
+                (rxCommand[ROLL ] > (eepromConfig.maxCheck - MIDCOMMAND)) &&
+                (rxCommand[PITCH] < (eepromConfig.minCheck - MIDCOMMAND)))
+        {
+            computeMPU6000RTData();
+            pulseMotors(3);
+        }
 
-		// Check for arm command ( low throttle, right yaw)
-		if ((rxCommand[YAW] > (eepromConfig.maxCheck - MIDCOMMAND) ) && (armed == false) && (execUp == true))
-		{
-			armingTimer++;
+        // Check for arm command ( low throttle, right yaw)
+        if ((rxCommand[YAW] > (eepromConfig.maxCheck - MIDCOMMAND)) && (armed == false) && (execUp == true))
+        {
+            armingTimer++;
 
-			if (armingTimer > eepromConfig.armCount)
-			{
-				zeroPIDintegralError();
-				zeroPIDstates();
-				armed = true;
-				armingTimer = 0;
-			}
-		}
-		else
-		{
-			armingTimer = 0;
-		}
-	}
+            if (armingTimer > eepromConfig.armCount)
+            {
+                zeroPIDintegralError();
+                zeroPIDstates();
+                armed = true;
+                armingTimer = 0;
+            }
+        }
+        else
+        {
+            armingTimer = 0;
+        }
+    }
 
-	///////////////////////////////////
+    ///////////////////////////////////
 
-	// Check for armed true and throttle command > minThrottle
+    // Check for armed true and throttle command > minThrottle
 
     if ((armed == true) && (rxCommand[THROTTLE] > eepromConfig.minThrottle))
-    	holdIntegrators = false;
+        holdIntegrators = false;
     else
-    	holdIntegrators = true;
+        holdIntegrators = true;
 
     ///////////////////////////////////
 
     // Check AUX1 for rate, attitude, or GPS mode (3 Position Switch) NOT COMPLETE YET....
 
-	if ((rxCommand[AUX1] > MIDCOMMAND) && (flightMode == RATE))
-	{
-		flightMode = ATTITUDE;
-		setPIDintegralError(ROLL_ATT_PID,  0.0f);
-		setPIDintegralError(PITCH_ATT_PID, 0.0f);
-		setPIDintegralError(HEADING_PID,   0.0f);
-		setPIDstates(ROLL_ATT_PID,  0.0f);
-		setPIDstates(PITCH_ATT_PID, 0.0f);
-		setPIDstates(HEADING_PID,   0.0f);
-	}
-	else if ((rxCommand[AUX1] <= MIDCOMMAND) && (flightMode == ATTITUDE))
-	{
-		flightMode = RATE;
-		setPIDintegralError(ROLL_RATE_PID,  0.0f);
-		setPIDintegralError(PITCH_RATE_PID, 0.0f);
-		setPIDintegralError(YAW_RATE_PID,   0.0f);
-		setPIDstates(ROLL_RATE_PID,  0.0f);
-		setPIDstates(PITCH_RATE_PID, 0.0f);
-		setPIDstates(YAW_RATE_PID,   0.0f);
-	}
+    if ((rxCommand[AUX1] > MIDCOMMAND) && (flightMode == RATE))
+    {
+        flightMode = ATTITUDE;
+        setPIDintegralError(ROLL_ATT_PID,  0.0f);
+        setPIDintegralError(PITCH_ATT_PID, 0.0f);
+        setPIDintegralError(HEADING_PID,   0.0f);
+        setPIDstates(ROLL_ATT_PID,  0.0f);
+        setPIDstates(PITCH_ATT_PID, 0.0f);
+        setPIDstates(HEADING_PID,   0.0f);
+    }
+    else if ((rxCommand[AUX1] <= MIDCOMMAND) && (flightMode == ATTITUDE))
+    {
+        flightMode = RATE;
+        setPIDintegralError(ROLL_RATE_PID,  0.0f);
+        setPIDintegralError(PITCH_RATE_PID, 0.0f);
+        setPIDintegralError(YAW_RATE_PID,   0.0f);
+        setPIDstates(ROLL_RATE_PID,  0.0f);
+        setPIDstates(PITCH_RATE_PID, 0.0f);
+        setPIDstates(YAW_RATE_PID,   0.0f);
+    }
 
-	///////////////////////////////////
+    ///////////////////////////////////
 
-	// Check yaw in detent and flight mode to determine hdg hold engaged state
+    // Check yaw in detent and flight mode to determine hdg hold engaged state
 
-	if ((commandInDetent[YAW] == true) && (flightMode == ATTITUDE))
-	    headingHoldEngaged = true;
-	else
-	    headingHoldEngaged = false;
+    if ((commandInDetent[YAW] == true) && (flightMode == ATTITUDE))
+        headingHoldEngaged = true;
+    else
+        headingHoldEngaged = false;
 
-	///////////////////////////////////
+    ///////////////////////////////////
 
-	// Check AUX2 for altitude hold mode (2 Position Switch)
+    // Check AUX2 for altitude hold mode (2 Position Switch)
 
-	if ((rxCommand[AUX2] > MIDCOMMAND) && (previousAUX2State <= MIDCOMMAND))      // Rising edge detection
-	{
-		altitudeHoldState = ENGAGED;
-		altitudeHoldThrottleValue = rxCommand[THROTTLE];
-	}
-	else if ((rxCommand[AUX2] <= MIDCOMMAND) && (previousAUX2State > MIDCOMMAND)) // Falling edge detection
-	{
-		altitudeHoldState = DISENGAGED;
-	}
+    if ((rxCommand[AUX2] > MIDCOMMAND) && (previousAUX2State <= MIDCOMMAND))      // Rising edge detection
+    {
+        altitudeHoldState = ENGAGED;
+        altitudeHoldThrottleValue = rxCommand[THROTTLE];
+    }
+    else if ((rxCommand[AUX2] <= MIDCOMMAND) && (previousAUX2State > MIDCOMMAND)) // Falling edge detection
+    {
+        altitudeHoldState = DISENGAGED;
+    }
 
-	previousAUX2State = rxCommand[AUX2];
+    previousAUX2State = rxCommand[AUX2];
 
 
-	///////////////////////////////////
+    ///////////////////////////////////
 }
 
 ///////////////////////////////////////////////////////////////////////////////

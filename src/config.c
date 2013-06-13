@@ -55,6 +55,7 @@ void parseRcChannels(const char *input)
     for (c = input; *c; c++)
     {
         s = strchr(rcChannelLetters, *c);
+
         if (s)
             eepromConfig.rcMap[s - rcChannelLetters] = c - input;
     }
@@ -89,7 +90,8 @@ void writeEEPROM(void)
     {
         for (i = 0; i < sizeof(eepromConfig_t); i += 4)
         {
-            status = FLASH_ProgramWord(FLASH_WRITE_EEPROM_ADDR + i, *(uint32_t *)((char *)&eepromConfig + i ));
+            status = FLASH_ProgramWord(FLASH_WRITE_EEPROM_ADDR + i, *(uint32_t *)((char *)&eepromConfig + i));
+
             if (status != FLASH_COMPLETE)
                 break; // TODO: fail
         }
@@ -110,10 +112,10 @@ void checkFirstTime(bool eepromReset)
 
     if (eepromReset || test_val != checkNewEEPROMConf)
     {
-		// Default settings
+        // Default settings
         eepromConfig.version = checkNewEEPROMConf;
 
-	    ///////////////////////////////
+        ///////////////////////////////
 
         eepromConfig.accelTCBiasSlope[XAXIS] = 0.0f;
         eepromConfig.accelTCBiasSlope[YAXIS] = 0.0f;
@@ -131,39 +133,39 @@ void checkFirstTime(bool eepromReset)
         eepromConfig.gyroTCBiasSlope[PITCH] = 0.0f;
         eepromConfig.gyroTCBiasSlope[YAW  ] = 0.0f;
 
-	    ///////////////////////////////
+        ///////////////////////////////
 
-	    eepromConfig.gyroTCBiasIntercept[ROLL ] = 0.0f;
-	    eepromConfig.gyroTCBiasIntercept[PITCH] = 0.0f;
-	    eepromConfig.gyroTCBiasIntercept[YAW  ] = 0.0f;
+        eepromConfig.gyroTCBiasIntercept[ROLL ] = 0.0f;
+        eepromConfig.gyroTCBiasIntercept[PITCH] = 0.0f;
+        eepromConfig.gyroTCBiasIntercept[YAW  ] = 0.0f;
 
-	    ///////////////////////////////
+        ///////////////////////////////
 
-	    eepromConfig.magBias[XAXIS] = 0.0f;
-	    eepromConfig.magBias[YAXIS] = 0.0f;
-	    eepromConfig.magBias[ZAXIS] = 0.0f;
+        eepromConfig.magBias[XAXIS] = 0.0f;
+        eepromConfig.magBias[YAXIS] = 0.0f;
+        eepromConfig.magBias[ZAXIS] = 0.0f;
 
-		///////////////////////////////
+        ///////////////////////////////
 
-		eepromConfig.accelCutoff = 1.0f;
+        eepromConfig.accelCutoff = 1.0f;
 
-		///////////////////////////////
+        ///////////////////////////////
 
-	    eepromConfig.KpAcc = 5.0f;    // proportional gain governs rate of convergence to accelerometer
-	    eepromConfig.KiAcc = 0.0f;    // integral gain governs rate of convergence of gyroscope biases
-	    eepromConfig.KpMag = 5.0f;    // proportional gain governs rate of convergence to magnetometer
-	    eepromConfig.KiMag = 0.0f;    // integral gain governs rate of convergence of gyroscope biases
+        eepromConfig.KpAcc = 5.0f;    // proportional gain governs rate of convergence to accelerometer
+        eepromConfig.KiAcc = 0.0f;    // integral gain governs rate of convergence of gyroscope biases
+        eepromConfig.KpMag = 5.0f;    // proportional gain governs rate of convergence to magnetometer
+        eepromConfig.KiMag = 0.0f;    // integral gain governs rate of convergence of gyroscope biases
 
-	    ///////////////////////////////
+        ///////////////////////////////
 
-	    eepromConfig.compFilterA =  0.005f;
-		eepromConfig.compFilterB =  0.005f;
+        eepromConfig.compFilterA =  0.005f;
+        eepromConfig.compFilterB =  0.005f;
 
-	    ///////////////////////////////
+        ///////////////////////////////
 
-	    eepromConfig.dlpfSetting = BITS_DLPF_CFG_98HZ;
+        eepromConfig.dlpfSetting = BITS_DLPF_CFG_98HZ;
 
-	    ///////////////////////////////////
+        ///////////////////////////////////
 
         eepromConfig.rateScaling     = 300.0 / 180000.0 * PI;  // Stick to rate scaling for 300 DPS
 
@@ -175,13 +177,13 @@ void checkFirstTime(bool eepromReset)
 
         ///////////////////////////////
 
-	    eepromConfig.receiverType  = PARALLEL_PWM;
-	    eepromConfig.spektrumChannels = 7;
-	    eepromConfig.spektrumHires = 0;
+        eepromConfig.receiverType  = PARALLEL_PWM;
+        eepromConfig.spektrumChannels = 7;
+        eepromConfig.spektrumHires = 0;
 
-	    parseRcChannels("TAER1234");
+        parseRcChannels("TAER1234");
 
-	    eepromConfig.escPwmRate   = 450;
+        eepromConfig.escPwmRate   = 450;
         eepromConfig.servoPwmRate = 50;
 
         eepromConfig.mixerConfiguration = MIXERTYPE_QUADX;
@@ -338,14 +340,14 @@ void checkFirstTime(bool eepromReset)
         eepromConfig.PID[H_PID].type                    =   OTHER;
 
         eepromConfig.gimbalRollServoMin    = 2000.0f;
-		eepromConfig.gimbalRollServoMid    = 3000.0f;
-		eepromConfig.gimbalRollServoMax    = 4000.0f;
-		eepromConfig.gimbalRollServoGain   = 1.0f;
+        eepromConfig.gimbalRollServoMid    = 3000.0f;
+        eepromConfig.gimbalRollServoMax    = 4000.0f;
+        eepromConfig.gimbalRollServoGain   = 1.0f;
 
-		eepromConfig.gimbalPitchServoMin   = 2000.0f;
-		eepromConfig.gimbalPitchServoMid   = 3000.0f;
-		eepromConfig.gimbalPitchServoMax   = 4000.0f;
-		eepromConfig.gimbalPitchServoGain  = 1.0f;
+        eepromConfig.gimbalPitchServoMin   = 2000.0f;
+        eepromConfig.gimbalPitchServoMid   = 3000.0f;
+        eepromConfig.gimbalPitchServoMax   = 4000.0f;
+        eepromConfig.gimbalPitchServoGain  = 1.0f;
 
         eepromConfig.rollDirectionLeft     = -1.0f;
         eepromConfig.rollDirectionRight    =  1.0f;
@@ -372,9 +374,9 @@ void checkFirstTime(bool eepromReset)
         eepromConfig.vTailAngle            = 40.0f;
 
         // Free Mix Defaults to Quad X
-		eepromConfig.freeMixMotors         = 4;
+        eepromConfig.freeMixMotors         = 4;
 
-		eepromConfig.freeMix[0][ROLL ]     =  1.0f;
+        eepromConfig.freeMix[0][ROLL ]     =  1.0f;
         eepromConfig.freeMix[0][PITCH]     = -1.0f;
         eepromConfig.freeMix[0][YAW  ]     = -1.0f;
 
@@ -424,7 +426,7 @@ void checkFirstTime(bool eepromReset)
         eepromConfig.accelScaleFactorMXR[ZAXIS] = 0.04937965f;  // (3.3 / 4096) / 0.16 * 9.8065
 
         writeEEPROM();
-	}
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////

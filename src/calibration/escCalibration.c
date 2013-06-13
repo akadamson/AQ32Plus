@@ -57,12 +57,14 @@ void escCalibration(void)
     cliPrint("Type 'Y' to continue, anything other character exits\n\n");
 
     while (cliAvailable() == false);
+
     temp = cliRead();
+
     if (temp != 'Y')
     {
-    	cliPrint("ESC Calibration Canceled!!\n\n");
-    	escCalibrating = false;
-    	return;
+        cliPrint("ESC Calibration Canceled!!\n\n");
+        escCalibrating = false;
+        return;
     }
 
     ///////////////////////////////////
@@ -72,37 +74,37 @@ void escCalibration(void)
     cliPrint("Enter 'l' for Min Command....\n");
     cliPrint("Enter 'x' to exit....\n\n");
 
-    while(true)
+    while (true)
     {
-		while (cliAvailable() == false);
+        while (cliAvailable() == false);
 
-		temp = cliRead();
+        temp = cliRead();
 
-		switch (temp)
-		{
-			case 'h':
-			    cliPrint("Applying Max Command....\n\n");
-			    writeAllMotors(eepromConfig.maxThrottle);
-			    break;
+        switch (temp)
+        {
+            case 'h':
+                cliPrint("Applying Max Command....\n\n");
+                writeAllMotors(eepromConfig.maxThrottle);
+                break;
 
-			case 'm':
-			    cliPrint("Applying Mid Command....\n\n");
-			    writeAllMotors(eepromConfig.midCommand);
-			    break;
+            case 'm':
+                cliPrint("Applying Mid Command....\n\n");
+                writeAllMotors(eepromConfig.midCommand);
+                break;
 
-			case 'l':
-			    cliPrint("Applying Min Command....\n\n");
-			    writeAllMotors(MINCOMMAND);
-			    break;
+            case 'l':
+                cliPrint("Applying Min Command....\n\n");
+                writeAllMotors(MINCOMMAND);
+                break;
 
-			case 'x':
-			    cliPrint("Applying Min Command, Exiting Calibration....\n\n");
-			    writeAllMotors(MINCOMMAND);
-			    escCalibrating = false;
-			    return;
-			    break;
-		}
-	}
+            case 'x':
+                cliPrint("Applying Min Command, Exiting Calibration....\n\n");
+                writeAllMotors(MINCOMMAND);
+                escCalibrating = false;
+                return;
+                break;
+        }
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -71,20 +71,20 @@ volatile uint8_t  tx1DmaEnabled = false;
 
 static void uart1TxDMA(void)
 {
-	if ((tx1DmaEnabled == true) || (tx1BufferHead == tx1BufferTail))  // Ignore call if already active or no new data in buffer
+    if ((tx1DmaEnabled == true) || (tx1BufferHead == tx1BufferTail))  // Ignore call if already active or no new data in buffer
         return;
 
     DMA2_Stream7->M0AR = (uint32_t)&tx1Buffer[tx1BufferTail];
 
     if (tx1BufferHead > tx1BufferTail)
     {
-	    DMA_SetCurrDataCounter(DMA2_Stream7, tx1BufferHead - tx1BufferTail);
-	    tx1BufferTail = tx1BufferHead;
+        DMA_SetCurrDataCounter(DMA2_Stream7, tx1BufferHead - tx1BufferTail);
+        tx1BufferTail = tx1BufferHead;
     }
     else
     {
-	    DMA_SetCurrDataCounter(DMA2_Stream7, UART1_BUFFER_SIZE - tx1BufferTail);
-	    tx1BufferTail = 0;
+        DMA_SetCurrDataCounter(DMA2_Stream7, UART1_BUFFER_SIZE - tx1BufferTail);
+        tx1BufferTail = 0;
     }
 
     tx1DmaEnabled = true;
@@ -127,7 +127,7 @@ void telemetryInit(void)
     GPIO_InitStructure.GPIO_Pin   = UART1_TX_PIN | UART1_RX_PIN;
     GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_AF;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-  //GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+    //GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
     GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_UP;
 
     GPIO_PinAFConfig(UART1_GPIO, UART1_TX_PINSOURCE, GPIO_AF_USART1);
@@ -144,11 +144,11 @@ void telemetryInit(void)
     NVIC_Init(&NVIC_InitStructure);
 
     USART_InitStructure.USART_BaudRate            = 115200;
-  //USART_InitStructure.USART_WordLength          = USART_WordLength_8b;
-  //USART_InitStructure.USART_StopBits            = USART_StopBits_1;
-  //USART_InitStructure.USART_Parity              = USART_Parity_No;
-  //USART_InitStructure.USART_Mode                = USART_Mode_Rx | USART_Mode_Tx;
-  //USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
+    //USART_InitStructure.USART_WordLength          = USART_WordLength_8b;
+    //USART_InitStructure.USART_StopBits            = USART_StopBits_1;
+    //USART_InitStructure.USART_Parity              = USART_Parity_No;
+    //USART_InitStructure.USART_Mode                = USART_Mode_Rx | USART_Mode_Tx;
+    //USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
 
     USART_Init(USART1, &USART_InitStructure);
 
@@ -159,18 +159,18 @@ void telemetryInit(void)
     DMA_InitStructure.DMA_Channel            = DMA_Channel_4;
     DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)&USART1->DR;
     DMA_InitStructure.DMA_Memory0BaseAddr    = (uint32_t)rx1Buffer;
-  //DMA_InitStructure.DMA_DIR                = DMA_DIR_PeripheralToMemory;
+    //DMA_InitStructure.DMA_DIR                = DMA_DIR_PeripheralToMemory;
     DMA_InitStructure.DMA_BufferSize         = UART1_BUFFER_SIZE;
-  //DMA_InitStructure.DMA_PeripheralInc      = DMA_PeripheralInc_Disable;
+    //DMA_InitStructure.DMA_PeripheralInc      = DMA_PeripheralInc_Disable;
     DMA_InitStructure.DMA_MemoryInc          = DMA_MemoryInc_Enable;
-  //DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte;
-  //DMA_InitStructure.DMA_MemoryDataSize     = DMA_MemoryDataSize_Byte;
+    //DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte;
+    //DMA_InitStructure.DMA_MemoryDataSize     = DMA_MemoryDataSize_Byte;
     DMA_InitStructure.DMA_Mode               = DMA_Mode_Circular;
     DMA_InitStructure.DMA_Priority           = DMA_Priority_Medium;
-  //DMA_InitStructure.DMA_FIFOMode           = DMA_FIFOMode_Disable;
-  //DMA_InitStructure.DMA_FIFOThreshold      = DMA_FIFOThreshold_1QuarterFull;
-  //DMA_InitStructure.DMA_MemoryBurst        = DMA_MemoryBurst_Single;
-  //DMA_InitStructure.DMA_PeripheralBurst    = DMA_PeripheralBurst_Single;
+    //DMA_InitStructure.DMA_FIFOMode           = DMA_FIFOMode_Disable;
+    //DMA_InitStructure.DMA_FIFOThreshold      = DMA_FIFOThreshold_1QuarterFull;
+    //DMA_InitStructure.DMA_MemoryBurst        = DMA_MemoryBurst_Single;
+    //DMA_InitStructure.DMA_PeripheralBurst    = DMA_PeripheralBurst_Single;
 
     DMA_Init(DMA2_Stream5, &DMA_InitStructure);
 
@@ -183,21 +183,21 @@ void telemetryInit(void)
     // Transmit DMA
     DMA_DeInit(DMA2_Stream7);
 
-  //DMA_InitStructure.DMA_Channel            = DMA_Channel_4;
-  //DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)&USART1->DR;
+    //DMA_InitStructure.DMA_Channel            = DMA_Channel_4;
+    //DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)&USART1->DR;
     DMA_InitStructure.DMA_Memory0BaseAddr    = (uint32_t)tx1Buffer;
     DMA_InitStructure.DMA_DIR                = DMA_DIR_MemoryToPeripheral;
-  //DMA_InitStructure.DMA_BufferSize         = UART_BUFFER_SIZE;
-  //DMA_InitStructure.DMA_PeripheralInc      = DMA_PeripheralInc_Disable;
-  //DMA_InitStructure.DMA_MemoryInc          = DMA_MemoryInc_Enable;
-  //DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte;
-  //DMA_InitStructure.DMA_MemoryDataSize     = DMA_MemoryDataSize_Byte;
+    //DMA_InitStructure.DMA_BufferSize         = UART_BUFFER_SIZE;
+    //DMA_InitStructure.DMA_PeripheralInc      = DMA_PeripheralInc_Disable;
+    //DMA_InitStructure.DMA_MemoryInc          = DMA_MemoryInc_Enable;
+    //DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte;
+    //DMA_InitStructure.DMA_MemoryDataSize     = DMA_MemoryDataSize_Byte;
     DMA_InitStructure.DMA_Mode               = DMA_Mode_Normal;
-  //DMA_InitStructure.DMA_Priority           = DMA_Priority_Medium;
-  //DMA_InitStructure.DMA_FIFOMode           = DMA_FIFOMode_Disable;
-  //DMA_InitStructure.DMA_FIFOThreshold      = DMA_FIFOThreshold_1QuarterFull;
-  //DMA_InitStructure.DMA_MemoryBurst        = DMA_MemoryBurst_Single;
-  //DMA_InitStructure.DMA_PeripheralBurst    = DMA_PeripheralBurst_Single;
+    //DMA_InitStructure.DMA_Priority           = DMA_Priority_Medium;
+    //DMA_InitStructure.DMA_FIFOMode           = DMA_FIFOMode_Disable;
+    //DMA_InitStructure.DMA_FIFOThreshold      = DMA_FIFOThreshold_1QuarterFull;
+    //DMA_InitStructure.DMA_MemoryBurst        = DMA_MemoryBurst_Single;
+    //DMA_InitStructure.DMA_PeripheralBurst    = DMA_PeripheralBurst_Single;
 
     DMA_Init(DMA2_Stream7, &DMA_InitStructure);
 
@@ -228,9 +228,10 @@ uint8_t telemetryRead(void)
     uint8_t ch;
 
     ch = rx1Buffer[UART1_BUFFER_SIZE - rx1DMAPos];
+
     // go back around the buffer
     if (--rx1DMAPos == 0)
-	    rx1DMAPos = UART1_BUFFER_SIZE;
+        rx1DMAPos = UART1_BUFFER_SIZE;
 
     return ch;
 }
@@ -242,6 +243,7 @@ uint8_t telemetryRead(void)
 uint8_t telemetryReadPoll(void)
 {
     while (!telemetryAvailable()); // wait for some bytes
+
     return telemetryRead();
 }
 
@@ -265,11 +267,11 @@ void telemetryPrint(char *str)
 {
     while (*str)
     {
-    	tx1Buffer[tx1BufferHead] = *str++;
-    	tx1BufferHead = (tx1BufferHead + 1) % UART1_BUFFER_SIZE;
+        tx1Buffer[tx1BufferHead] = *str++;
+        tx1BufferHead = (tx1BufferHead + 1) % UART1_BUFFER_SIZE;
     }
 
-	uart1TxDMA();
+    uart1TxDMA();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -277,16 +279,16 @@ void telemetryPrint(char *str)
 // From Ala42
 ///////////////////////////////////////////////////////////////////////////////
 
-void telemetryPrintF(const char * fmt, ...)
+void telemetryPrintF(const char *fmt, ...)
 {
-	char buf[256];
+    char buf[256];
 
-	va_list  vlist;
-	va_start (vlist, fmt);
+    va_list  vlist;
+    va_start(vlist, fmt);
 
-	vsnprintf(buf, sizeof(buf), fmt, vlist);
-	telemetryPrint(buf);
-	va_end(vlist);
+    vsnprintf(buf, sizeof(buf), fmt, vlist);
+    telemetryPrint(buf);
+    va_end(vlist);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

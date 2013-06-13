@@ -58,7 +58,7 @@ bool i2cWrite(I2C_TypeDef *I2C, uint8_t addr_, uint8_t reg, uint8_t data);
 // I2C Read
 ///////////////////////////////////////////////////////////////////////////////
 
-bool i2cRead(I2C_TypeDef *I2C, uint8_t addr_, uint8_t reg, uint8_t len, uint8_t* buf);
+bool i2cRead(I2C_TypeDef *I2C, uint8_t addr_, uint8_t reg, uint8_t len, uint8_t *buf);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Get I2C Error Count

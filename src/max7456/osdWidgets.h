@@ -47,8 +47,8 @@ void displayAltitude(float pressureAltitude, float altitudeReference, uint8_t al
 ///////////////////////////////////////////////////////////////////////////////
 
 #define AH_DISPLAY_RECT_HEIGHT  9  // Height of rectangle bounding AI.
-                                   // Should be odd so that there is an equal space
-                                   // above/below the center reticle
+// Should be odd so that there is an equal space
+// above/below the center reticle
 
 extern uint8_t reticleRow;
 extern uint8_t ahTopPixel;
@@ -62,8 +62,8 @@ void displayArtificialHorizon(float roll, float pitch, uint8_t flightMode);
 ///////////////////////////////////////////////////////////////////////////////
 
 #define AI_DISPLAY_RECT_HEIGHT  9  // Height of rectangle bounding AI.
-                                   // Should be odd so that there is an equal space
-                                   // above/below the center reticle
+// Should be odd so that there is an equal space
+// above/below the center reticle
 
 extern uint8_t aiTopPixel;
 extern uint8_t aiBottomPixel;

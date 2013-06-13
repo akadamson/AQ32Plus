@@ -8,9 +8,9 @@
  **  Environment : Atollic TrueSTUDIO(R)
  **                STMicroelectronics STM32F4xx Standard Peripherals Library
  **
- **  Author 	 : Ronan Douguet
+ **  Author      : Ronan Douguet
  **
- **  Date	     : 08-03-2012
+ **  Date        : 08-03-2012
  **
  ********************************************************************************
  */
@@ -29,30 +29,30 @@
 
 ///////////////////////////////////////
 
-#define CMD0	(0x40+0)	// GO_IDLE_STATE
-#define CMD1	(0x40+1)	// SEND_OP_COND (MMC)
-#define ACMD41	(0xC0+41)	// SEND_OP_COND (SDC)
-#define CMD8	(0x40+8)	// SEND_IF_COND
-#define CMD9	(0x40+9)	// SEND_CSD
-#define CMD10	(0x40+10)	// SEND_CID
-#define CMD12	(0x40+12)	// STOP_TRANSMISSION
-#define ACMD13	(0xC0+13)	// SD_STATUS (SDC)
-#define CMD16	(0x40+16)	// SET_BLOCKLEN
-#define CMD17	(0x40+17)	// READ_SINGLE_BLOCK
-#define CMD18	(0x40+18)	// READ_MULTIPLE_BLOCK
-#define CMD23	(0x40+23)	// SET_BLOCK_COUNT (MMC)
-#define ACMD23	(0xC0+23)	// SET_WR_BLK_ERASE_COUNT (SDC)
-#define CMD24	(0x40+24)	// WRITE_BLOCK
-#define CMD25	(0x40+25)	// WRITE_MULTIPLE_BLOCK
-#define CMD55	(0x40+55)	// APP_CMD
-#define CMD58	(0x40+58)	// READ_OCR
+#define CMD0    (0x40+0)    // GO_IDLE_STATE
+#define CMD1    (0x40+1)    // SEND_OP_COND (MMC)
+#define ACMD41  (0xC0+41)   // SEND_OP_COND (SDC)
+#define CMD8    (0x40+8)    // SEND_IF_COND
+#define CMD9    (0x40+9)    // SEND_CSD
+#define CMD10   (0x40+10)   // SEND_CID
+#define CMD12   (0x40+12)   // STOP_TRANSMISSION
+#define ACMD13  (0xC0+13)   // SD_STATUS (SDC)
+#define CMD16   (0x40+16)   // SET_BLOCKLEN
+#define CMD17   (0x40+17)   // READ_SINGLE_BLOCK
+#define CMD18   (0x40+18)   // READ_MULTIPLE_BLOCK
+#define CMD23   (0x40+23)   // SET_BLOCK_COUNT (MMC)
+#define ACMD23  (0xC0+23)   // SET_WR_BLK_ERASE_COUNT (SDC)
+#define CMD24   (0x40+24)   // WRITE_BLOCK
+#define CMD25   (0x40+25)   // WRITE_MULTIPLE_BLOCK
+#define CMD55   (0x40+55)   // APP_CMD
+#define CMD58   (0x40+58)   // READ_OCR
 
 ///////////////////////////////////////
 
 #if (_MAX_SS != 512) || (_FS_READONLY == 0) || (STM32_SD_DISK_IOCTRL_FORCE == 1)
-    #define _USE_IOCTL   1
+#define _USE_IOCTL   1
 #else
-    #define _USE_IOCTL   0
+#define _USE_IOCTL   0
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -60,7 +60,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 static volatile DSTATUS Stat = STA_NOINIT;            // Disk status
-static volatile DWORD Timer1, Timer2;			      // 100Hz decrement timers
+static volatile DWORD Timer1, Timer2;                 // 100Hz decrement timers
 static BYTE CardType;                                 // Card type flags
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -111,7 +111,7 @@ void stm32_dma_transfer(BOOL receive, const BYTE *buff, UINT btr)
     DMA_DeInit(SDCARD_SPI_RX_DMA_STREAM);
     DMA_DeInit(SDCARD_SPI_TX_DMA_STREAM);
 
-    DMA_StructInit (&DMA_InitStructure);
+    DMA_StructInit(&DMA_InitStructure);
 
     // shared DMA configuration values
     DMA_InitStructure.DMA_PeripheralBaseAddr = (DWORD)(&(SDCARD_SPI->DR));
@@ -142,7 +142,7 @@ void stm32_dma_transfer(BOOL receive, const BYTE *buff, UINT btr)
     }
     else
     {
-    #if _FS_READONLY == 0
+#if _FS_READONLY == 0
         // DMA configuration SPI1 RX
         DMA_InitStructure.DMA_Memory0BaseAddr = (DWORD)rw_workbyte;
         DMA_InitStructure.DMA_Channel         = SDCARD_SPI_RX_DMA_CHANNEL;
@@ -158,7 +158,7 @@ void stm32_dma_transfer(BOOL receive, const BYTE *buff, UINT btr)
         DMA_InitStructure.DMA_MemoryInc       = DMA_MemoryInc_Enable;
 
         DMA_Init(SDCARD_SPI_TX_DMA_STREAM, &DMA_InitStructure);
-    #endif
+#endif
     }
 
     // Enable DMA RX Channel
@@ -190,92 +190,92 @@ void stm32_dma_transfer(BOOL receive, const BYTE *buff, UINT btr)
 
 void power_on(void)
 {
-    #ifdef STM32_SD_USE_DMA
-        DMA_InitTypeDef DMA_InitStructure;
-    #endif
+#ifdef STM32_SD_USE_DMA
+    DMA_InitTypeDef DMA_InitStructure;
+#endif
 
     spiInit(SDCARD_SPI);
 
-    #ifdef STM32_SD_USE_DMA
-        RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_DMA2, ENABLE);
+#ifdef STM32_SD_USE_DMA
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_DMA2, ENABLE);
 
-        // all new coded added below AKA
-        // setup the DMA TX Channel/Stream
-        DMA_DeInit(SDCARD_SPI_TX_DMA_STREAM);
+    // all new coded added below AKA
+    // setup the DMA TX Channel/Stream
+    DMA_DeInit(SDCARD_SPI_TX_DMA_STREAM);
 
-        /*
-        * Check if the DMA Stream is disabled before enabling it.
-        * Note that this step is useful when the same Stream is used multiple times:
-        * enabled, then disabled then re-enabled... In this case, the DMA Stream disable
-        * will be effective only at the end of the ongoing data transfer and it will
-        * not be possible to re-configure it before making sure that the Enable bit
-        * has been cleared by hardware. If the Stream is used only once, this step might
-        * be bypassed.
-        */
+    /*
+    * Check if the DMA Stream is disabled before enabling it.
+    * Note that this step is useful when the same Stream is used multiple times:
+    * enabled, then disabled then re-enabled... In this case, the DMA Stream disable
+    * will be effective only at the end of the ongoing data transfer and it will
+    * not be possible to re-configure it before making sure that the Enable bit
+    * has been cleared by hardware. If the Stream is used only once, this step might
+    * be bypassed.
+    */
 
-	    while (DMA_GetCmdStatus(SDCARD_SPI_TX_DMA_STREAM) != DISABLE);
+    while (DMA_GetCmdStatus(SDCARD_SPI_TX_DMA_STREAM) != DISABLE);
 
-	    DMA_StructInit (&DMA_InitStructure);
+    DMA_StructInit(&DMA_InitStructure);
 
-    	DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t) &(SDCARD_SPI->DR);
-	    DMA_InitStructure.DMA_Channel            = SDCARD_SPI_TX_DMA_CHANNEL;
-    	DMA_InitStructure.DMA_DIR                = DMA_DIR_MemoryToPeripheral;
-	    DMA_InitStructure.DMA_MemoryInc          = DMA_MemoryInc_Enable;
-	    DMA_InitStructure.DMA_PeripheralInc      = DMA_MemoryInc_Enable;
-	    DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte;
-    	DMA_InitStructure.DMA_MemoryDataSize     = DMA_MemoryDataSize_Byte;
-	    DMA_InitStructure.DMA_Mode               = DMA_Mode_Normal;
-	    DMA_InitStructure.DMA_Priority           = DMA_Priority_High;
-	    DMA_InitStructure.DMA_FIFOMode           = DMA_FIFOMode_Enable;
-	    DMA_InitStructure.DMA_FIFOThreshold      = DMA_FIFOThreshold_HalfFull;
-	    DMA_InitStructure.DMA_MemoryBurst        = DMA_MemoryBurst_Single;
-	    DMA_InitStructure.DMA_PeripheralBurst    = DMA_PeripheralBurst_Single;
-	    DMA_InitStructure.DMA_Memory0BaseAddr    = 0;
-	    DMA_InitStructure.DMA_BufferSize         = 1;
+    DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t) & (SDCARD_SPI->DR);
+    DMA_InitStructure.DMA_Channel            = SDCARD_SPI_TX_DMA_CHANNEL;
+    DMA_InitStructure.DMA_DIR                = DMA_DIR_MemoryToPeripheral;
+    DMA_InitStructure.DMA_MemoryInc          = DMA_MemoryInc_Enable;
+    DMA_InitStructure.DMA_PeripheralInc      = DMA_MemoryInc_Enable;
+    DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte;
+    DMA_InitStructure.DMA_MemoryDataSize     = DMA_MemoryDataSize_Byte;
+    DMA_InitStructure.DMA_Mode               = DMA_Mode_Normal;
+    DMA_InitStructure.DMA_Priority           = DMA_Priority_High;
+    DMA_InitStructure.DMA_FIFOMode           = DMA_FIFOMode_Enable;
+    DMA_InitStructure.DMA_FIFOThreshold      = DMA_FIFOThreshold_HalfFull;
+    DMA_InitStructure.DMA_MemoryBurst        = DMA_MemoryBurst_Single;
+    DMA_InitStructure.DMA_PeripheralBurst    = DMA_PeripheralBurst_Single;
+    DMA_InitStructure.DMA_Memory0BaseAddr    = 0;
+    DMA_InitStructure.DMA_BufferSize         = 1;
 
-	    DMA_Init (SDCARD_SPI_TX_DMA_STREAM, &DMA_InitStructure);
+    DMA_Init(SDCARD_SPI_TX_DMA_STREAM, &DMA_InitStructure);
 
-	    // Enable dma tx request.
-	    SPI_I2S_DMACmd (SDCARD_SPI, SPI_I2S_DMAReq_Tx, ENABLE);
+    // Enable dma tx request.
+    SPI_I2S_DMACmd(SDCARD_SPI, SPI_I2S_DMAReq_Tx, ENABLE);
 
-        // setup the DMA RX Channel/Stream
-        DMA_DeInit(SDCARD_SPI_RX_DMA_STREAM);
+    // setup the DMA RX Channel/Stream
+    DMA_DeInit(SDCARD_SPI_RX_DMA_STREAM);
 
-        /*
-        * Check if the DMA Stream is disabled before enabling it.
-        * Note that this step is useful when the same Stream is used multiple times:
-        * enabled, then disabled then re-enabled... In this case, the DMA Stream disable
-        * will be effective only at the end of the ongoing data transfer and it will
-        * not be possible to re-configure it before making sure that the Enable bit
-        * has been cleared by hardware. If the Stream is used only once, this step might
-        * be bypassed.
-        */
+    /*
+    * Check if the DMA Stream is disabled before enabling it.
+    * Note that this step is useful when the same Stream is used multiple times:
+    * enabled, then disabled then re-enabled... In this case, the DMA Stream disable
+    * will be effective only at the end of the ongoing data transfer and it will
+    * not be possible to re-configure it before making sure that the Enable bit
+    * has been cleared by hardware. If the Stream is used only once, this step might
+    * be bypassed.
+    */
 
-	    while (DMA_GetCmdStatus(SDCARD_SPI_RX_DMA_STREAM) != DISABLE);
+    while (DMA_GetCmdStatus(SDCARD_SPI_RX_DMA_STREAM) != DISABLE);
 
-        DMA_StructInit (&DMA_InitStructure);
+    DMA_StructInit(&DMA_InitStructure);
 
-        DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t) & (SDCARD_SPI->DR);
-	    DMA_InitStructure.DMA_Channel            = SDCARD_SPI_RX_DMA_CHANNEL;
-	    DMA_InitStructure.DMA_DIR                = DMA_DIR_PeripheralToMemory;
-	    DMA_InitStructure.DMA_MemoryInc          = DMA_MemoryInc_Enable;
-	    DMA_InitStructure.DMA_PeripheralInc      = DMA_MemoryInc_Enable;
-	    DMA_InitStructure.DMA_PeripheralDataSize = DMA_MemoryDataSize_Byte;
-	    DMA_InitStructure.DMA_MemoryDataSize     = DMA_MemoryDataSize_Byte;
-	    DMA_InitStructure.DMA_Mode               = DMA_Mode_Normal;
-	    DMA_InitStructure.DMA_Priority           = DMA_Priority_High;
-	    DMA_InitStructure.DMA_FIFOMode           = DMA_FIFOMode_Enable;
-	    DMA_InitStructure.DMA_FIFOThreshold      = DMA_FIFOThreshold_HalfFull;
-	    DMA_InitStructure.DMA_MemoryBurst        = DMA_MemoryBurst_Single;
-	    DMA_InitStructure.DMA_PeripheralBurst    = DMA_PeripheralBurst_Single;
-	    DMA_InitStructure.DMA_Memory0BaseAddr    = 0;
-	    DMA_InitStructure.DMA_BufferSize         = 1;
+    DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t) & (SDCARD_SPI->DR);
+    DMA_InitStructure.DMA_Channel            = SDCARD_SPI_RX_DMA_CHANNEL;
+    DMA_InitStructure.DMA_DIR                = DMA_DIR_PeripheralToMemory;
+    DMA_InitStructure.DMA_MemoryInc          = DMA_MemoryInc_Enable;
+    DMA_InitStructure.DMA_PeripheralInc      = DMA_MemoryInc_Enable;
+    DMA_InitStructure.DMA_PeripheralDataSize = DMA_MemoryDataSize_Byte;
+    DMA_InitStructure.DMA_MemoryDataSize     = DMA_MemoryDataSize_Byte;
+    DMA_InitStructure.DMA_Mode               = DMA_Mode_Normal;
+    DMA_InitStructure.DMA_Priority           = DMA_Priority_High;
+    DMA_InitStructure.DMA_FIFOMode           = DMA_FIFOMode_Enable;
+    DMA_InitStructure.DMA_FIFOThreshold      = DMA_FIFOThreshold_HalfFull;
+    DMA_InitStructure.DMA_MemoryBurst        = DMA_MemoryBurst_Single;
+    DMA_InitStructure.DMA_PeripheralBurst    = DMA_PeripheralBurst_Single;
+    DMA_InitStructure.DMA_Memory0BaseAddr    = 0;
+    DMA_InitStructure.DMA_BufferSize         = 1;
 
-	    DMA_Init (SDCARD_SPI_RX_DMA_STREAM, &DMA_InitStructure);
+    DMA_Init(SDCARD_SPI_RX_DMA_STREAM, &DMA_InitStructure);
 
-	    // Enable dma rx request.
-	    SPI_I2S_DMACmd (SDCARD_SPI, SPI_I2S_DMAReq_Rx, ENABLE);
-    #endif
+    // Enable dma rx request.
+    SPI_I2S_DMACmd(SDCARD_SPI, SPI_I2S_DMAReq_Rx, ENABLE);
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -298,8 +298,8 @@ void power_off(void)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Receive a data packet from MMC
-//   *buff:	Data buffer to store received data
-//   btr:	Byte count (must be multiple of 4)
+//   *buff: Data buffer to store received data
+//   btr:   Byte count (must be multiple of 4)
 ///////////////////////////////////////////////////////////////////////////////
 
 BOOL rcvr_datablock(BYTE *buff, UINT btr)
@@ -317,20 +317,20 @@ BOOL rcvr_datablock(BYTE *buff, UINT btr)
     if (token != 0xFE)
         return FALSE;                                 // If not valid data token, return with error
 
-    #ifdef STM32_SD_USE_DMA
-        stm32_dma_transfer(TRUE, buff, btr);
-    #else
+#ifdef STM32_SD_USE_DMA
+    stm32_dma_transfer(TRUE, buff, btr);
+#else
 
-        do                                            // Receive the data block into buffer
-        {
-             *(buff++) = spiTransfer(SDCARD_SPI, 0xFF);
-             *(buff++) = spiTransfer(SDCARD_SPI, 0xFF);
-             *(buff++) = spiTransfer(SDCARD_SPI, 0xFF);
-             *(buff++) = spiTransfer(SDCARD_SPI, 0xFF);
-        }
-        while (btr -= 4);
+    do                                            // Receive the data block into buffer
+    {
+        *(buff++) = spiTransfer(SDCARD_SPI, 0xFF);
+        *(buff++) = spiTransfer(SDCARD_SPI, 0xFF);
+        *(buff++) = spiTransfer(SDCARD_SPI, 0xFF);
+        *(buff++) = spiTransfer(SDCARD_SPI, 0xFF);
+    }
+    while (btr -= 4);
 
-    #endif /* STM32_SD_USE_DMA */
+#endif /* STM32_SD_USE_DMA */
 
     spiTransfer(SDCARD_SPI, 0xFF);                    // Discard CRC
     spiTransfer(SDCARD_SPI, 0xFF);
@@ -341,17 +341,17 @@ BOOL rcvr_datablock(BYTE *buff, UINT btr)
 #if _FS_READONLY == 0
 ///////////////////////////////////////////////////////////////////////////////
 // Send a data packet to MMC
-//   *buff:	512 byte data block to be transmitted
-//   token:	Data/Stop token
+//   *buff: 512 byte data block to be transmitted
+//   token: Data/Stop token
 ///////////////////////////////////////////////////////////////////////////////
 
 BOOL xmit_datablock(const BYTE *buff, BYTE token)
 {
     BYTE resp;
 
-    #ifndef STM32_SD_USE_DMA
-        BYTE wc;
-    #endif
+#ifndef STM32_SD_USE_DMA
+    BYTE wc;
+#endif
 
     if (wait_ready() != 0xFF)
         return FALSE;
@@ -361,9 +361,9 @@ BOOL xmit_datablock(const BYTE *buff, BYTE token)
     if (token != 0xFD)                                // Is data token
     {
 
-    #ifdef STM32_SD_USE_DMA
+#ifdef STM32_SD_USE_DMA
         stm32_dma_transfer(FALSE, buff, 512);
-    #else
+#else
         wc = 0;
 
         do                                            // transmit the 512 byte data block to MMC
@@ -373,7 +373,7 @@ BOOL xmit_datablock(const BYTE *buff, BYTE token)
         }
         while (--wc);
 
-    #endif /* STM32_SD_USE_DMA */
+#endif /* STM32_SD_USE_DMA */
 
         spiTransfer(SDCARD_SPI, 0xFF);                // CRC (Dummy)
         spiTransfer(SDCARD_SPI, 0xFF);
@@ -417,25 +417,25 @@ BYTE send_cmd(BYTE cmd, DWORD arg)
         }
     }
 
-    spiTransfer(SDCARD_SPI, cmd);				      // Send command index
+    spiTransfer(SDCARD_SPI, cmd);                     // Send command index
 
-    spiTransfer(SDCARD_SPI, (BYTE)(arg >> 24));		  // Send argument[31..24]
-    spiTransfer(SDCARD_SPI, (BYTE)(arg >> 16));		  // Send argument[23..16]
-    spiTransfer(SDCARD_SPI, (BYTE)(arg >> 8));	      // Send argument[15..8]
-    spiTransfer(SDCARD_SPI, (BYTE)arg);				  // Send argument[7..0]
+    spiTransfer(SDCARD_SPI, (BYTE)(arg >> 24));       // Send argument[31..24]
+    spiTransfer(SDCARD_SPI, (BYTE)(arg >> 16));       // Send argument[23..16]
+    spiTransfer(SDCARD_SPI, (BYTE)(arg >> 8));        // Send argument[15..8]
+    spiTransfer(SDCARD_SPI, (BYTE)arg);               // Send argument[7..0]
 
-    n = 0x01;							              // Stop : Dummy CRC
+    n = 0x01;                                         // Stop : Dummy CRC
 
     if (cmd == CMD0)
-        n = 0x95;			                          // Valid CRC for CMD0(0)
+        n = 0x95;                                     // Valid CRC for CMD0(0)
 
     if (cmd == CMD8)
-        n = 0x87;			                          // Valid CRC for CMD8(0x1AA)
+        n = 0x87;                                     // Valid CRC for CMD8(0x1AA)
 
-    spiTransfer(SDCARD_SPI, n);						  // Send CRC
+    spiTransfer(SDCARD_SPI, n);                       // Send CRC
 
     if (cmd == CMD12)
-        spiTransfer(SDCARD_SPI, 0xFF);		          // Skip a stuff byte when stop reading
+        spiTransfer(SDCARD_SPI, 0xFF);                // Skip a stuff byte when stop reading
 
     n = 10;
 
@@ -492,7 +492,7 @@ DSTATUS disk_initialize(BYTE drv)
                 }
             }
         }
-        else  							              // SDSC or MMC
+        else                                          // SDSC or MMC
         {
             if (send_cmd(ACMD41, 0) <= 1)
             {
@@ -502,10 +502,10 @@ DSTATUS disk_initialize(BYTE drv)
             else
             {
                 ty = CT_MMC;
-                cmd = CMD1;	                          // MMC
+                cmd = CMD1;                           // MMC
             }
 
-            while (Timer1 && send_cmd(cmd, 0));		  // Wait for leaving idle state
+            while (Timer1 && send_cmd(cmd, 0));       // Wait for leaving idle state
 
             if (!Timer1 || send_cmd(CMD16, 512) != 0) // Set R/W block length to 512
                 ty = 0;
@@ -520,13 +520,17 @@ DSTATUS disk_initialize(BYTE drv)
     if (ty)                                           // Initialization succeeded
     {
         Stat &= ~STA_NOINIT;                          // Clear STA_NOINIT
-        setSPIdivisor(SDCARD_SPI, 4);                 // 10.5 MHz SPI clock
+        setSPIdivisor(SDCARD_SPI, 4);                 // 10.5 MHz SPI clock  AKA changed from 4 until driver is fixed.
+#ifdef DEBUG
         cliPrintF("SD Card Initialized....\n\n");
+#endif
     }
     else
     {
         power_off();                                  // Initialization failed
+#ifdef DEBUG
         cliPrintF("SD Card Failed....\n\n");
+#endif
     }
 
     return Stat;
@@ -547,10 +551,10 @@ DSTATUS disk_status(BYTE drv)
 
 ///////////////////////////////////////////////////////////////////////////////
 // READ SECTOR(S)
-//   drv:	 Physical drive number (0)
+//   drv:    Physical drive number (0)
 //   *buff:  Pointer to the data buffer to store read data
 //   sector: Start sector number (LBA)
-//   count:	 Sector count (1..255)
+//   count:  Sector count (1..255)
 ///////////////////////////////////////////////////////////////////////////////
 
 DRESULT disk_read(BYTE drv, BYTE *buff, DWORD sector, BYTE count)
@@ -601,10 +605,10 @@ DRESULT disk_read(BYTE drv, BYTE *buff, DWORD sector, BYTE count)
 #if _FS_READONLY == 0
 ///////////////////////////////////////////////////////////////////////////////
 // WRITE SECTOR(S)
-//   drv:	 Physical drive numbre (0)
-//   *buff:	 Pointer to the data to be written
+//   drv:    Physical drive numbre (0)
+//   *buff:  Pointer to the data to be written
 //   sector: Start sector number (LBA)
-//   count:	 Sector count (1..255)
+//   count:  Sector count (1..255)
 ///////////////////////////////////////////////////////////////////////////////
 
 DRESULT disk_write(BYTE drv, const BYTE *buff, DWORD sector, BYTE count)
@@ -657,9 +661,9 @@ DRESULT disk_write(BYTE drv, const BYTE *buff, DWORD sector, BYTE count)
 #if (_USE_IOCTL == 1)
 ///////////////////////////////////////////////////////////////////////////////
 // GET CURRENT TIME INTO A DWORD VALUE
-//   drv:	Physical drive number (0)
-//   ctrl:	Control code
-//   *buff:	Buffer to send/receive control data
+//   drv:   Physical drive number (0)
+//   ctrl:  Control code
+//   *buff: Buffer to send/receive control data
 ///////////////////////////////////////////////////////////////////////////////
 
 DRESULT disk_ioctl(BYTE drv, BYTE ctrl, void *buff)
@@ -669,7 +673,7 @@ DRESULT disk_ioctl(BYTE drv, BYTE ctrl, void *buff)
     WORD csize;
 
     if (drv)
-    	return RES_PARERR;
+        return RES_PARERR;
 
     res = RES_ERROR;
 
@@ -677,17 +681,17 @@ DRESULT disk_ioctl(BYTE drv, BYTE ctrl, void *buff)
     {
         switch (*ptr)
         {
-            case 0:		                              // Sub control code == 0 (POWER_OFF)
-                power_off();		                  // Power off
+            case 0:                                   // Sub control code == 0 (POWER_OFF)
+                power_off();                          // Power off
                 res = RES_OK;
                 break;
 
-            case 1:		                              // Sub control code == 1 (POWER_ON)
-                power_on();				              // Power on
+            case 1:                                   // Sub control code == 1 (POWER_ON)
+                power_on();                           // Power on
                 res = RES_OK;
                 break;
 
-            case 2:		                              // Sub control code == 2 (POWER_GET)
+            case 2:                                   // Sub control code == 2 (POWER_GET)
                 //fix
                 *(ptr + 1) = (BYTE)1;
                 res = RES_OK;
@@ -700,11 +704,11 @@ DRESULT disk_ioctl(BYTE drv, BYTE ctrl, void *buff)
     else
     {
         if (Stat & STA_NOINIT)
-        	return RES_NOTRDY;
+            return RES_NOTRDY;
 
         switch (ctrl)
         {
-            case CTRL_SYNC :		                  // Make sure that no pending write process
+            case CTRL_SYNC :                          // Make sure that no pending write process
                 ENABLE_SDCARD;
 
                 if (wait_ready() == 0xFF)
@@ -712,15 +716,15 @@ DRESULT disk_ioctl(BYTE drv, BYTE ctrl, void *buff)
 
                 break;
 
-            case GET_SECTOR_COUNT :	                  // Get number of sectors on the disk (DWORD)
+            case GET_SECTOR_COUNT :                   // Get number of sectors on the disk (DWORD)
                 if ((send_cmd(CMD9, 0) == 0) && rcvr_datablock(csd, 16))
                 {
-                    if ((csd[0] >> 6) == 1)  	      // SDC version 2.00
+                    if ((csd[0] >> 6) == 1)           // SDC version 2.00
                     {
                         csize = csd[9] + ((WORD)csd[8] << 8) + 1;
                         *(DWORD *)buff = (DWORD)csize << 10;
                     }
-                    else  					          // SDC version 1.XX or MMC
+                    else                              // SDC version 1.XX or MMC
                     {
                         n = (csd[5] & 15) + ((csd[10] & 128) >> 7) + ((csd[9] & 3) << 1) + 2;
                         csize = (csd[8] >> 6) + ((WORD)csd[7] << 2) + ((WORD)(csd[6] & 3) << 10) + 1;
@@ -732,13 +736,13 @@ DRESULT disk_ioctl(BYTE drv, BYTE ctrl, void *buff)
 
                 break;
 
-            case GET_SECTOR_SIZE :	                  // Get R/W sector size (WORD)
+            case GET_SECTOR_SIZE :                    // Get R/W sector size (WORD)
                 *(WORD *)buff = 512;
                 res = RES_OK;
                 break;
 
-            case GET_BLOCK_SIZE :	                  // Get erase block size in unit of sector (DWORD)
-                if (CardType & CT_SD2)  	          // SDC version 2.00
+            case GET_BLOCK_SIZE :                     // Get erase block size in unit of sector (DWORD)
+                if (CardType & CT_SD2)                // SDC version 2.00
                 {
                     if (send_cmd(ACMD13, 0) == 0)     // Read SD status
                     {
@@ -754,15 +758,15 @@ DRESULT disk_ioctl(BYTE drv, BYTE ctrl, void *buff)
                         }
                     }
                 }
-                else  					              // SDC version 1.XX or MMC
+                else                                  // SDC version 1.XX or MMC
                 {
                     if ((send_cmd(CMD9, 0) == 0) && rcvr_datablock(csd, 16)) // Read CSD
                     {
-                        if (CardType & CT_SD1)  	  // SDC version 1.XX
+                        if (CardType & CT_SD1)        // SDC version 1.XX
                         {
                             *(DWORD *)buff = (((csd[10] & 63) << 1) + ((WORD)(csd[11] & 128) >> 7) + 1) << ((csd[13] >> 6) - 1);
                         }
-                        else  					      // MMC
+                        else                          // MMC
                         {
                             *(DWORD *)buff = ((WORD)((csd[10] & 124) >> 2) + 1) * (((csd[11] & 3) << 3) + ((csd[11] & 224) >> 5) + 1);
                         }
@@ -773,27 +777,27 @@ DRESULT disk_ioctl(BYTE drv, BYTE ctrl, void *buff)
 
                 break;
 
-            case MMC_GET_TYPE :		                  // Get card type flags (1 byte)
+            case MMC_GET_TYPE :                       // Get card type flags (1 byte)
                 *ptr = CardType;
                 res = RES_OK;
                 break;
 
-            case MMC_GET_CSD :		                  // Receive CSD as a data block (16 bytes)
-                if (send_cmd(CMD9, 0) == 0 &&		  // READ_CSD
-                    rcvr_datablock(ptr, 16))
+            case MMC_GET_CSD :                        // Receive CSD as a data block (16 bytes)
+                if (send_cmd(CMD9, 0) == 0 &&         // READ_CSD
+                        rcvr_datablock(ptr, 16))
                     res = RES_OK;
 
                 break;
 
-            case MMC_GET_CID :		                  // Receive CID as a data block (16 bytes)
-                if (send_cmd(CMD10, 0) == 0	&&	      // READ_CID
-                    rcvr_datablock(ptr, 16))
+            case MMC_GET_CID :                        // Receive CID as a data block (16 bytes)
+                if (send_cmd(CMD10, 0) == 0 &&        // READ_CID
+                        rcvr_datablock(ptr, 16))
                     res = RES_OK;
 
                 break;
 
-            case MMC_GET_OCR :		                  // Receive OCR as an R3 resp (4 bytes)
-                if (send_cmd(CMD58, 0) == 0)  	      // READ_OCR
+            case MMC_GET_OCR :                        // Receive OCR as an R3 resp (4 bytes)
+                if (send_cmd(CMD58, 0) == 0)          // READ_OCR
                 {
                     for (n = 4; n; n--)
                         *ptr++ = spiTransfer(SDCARD_SPI, 0xFF);
@@ -803,8 +807,8 @@ DRESULT disk_ioctl(BYTE drv, BYTE ctrl, void *buff)
 
                 break;
 
-            case MMC_GET_SDSTAT :	                  // Receive SD status as a data block (64 bytes)
-                if (send_cmd(ACMD13, 0) == 0)  	      // SD_STATUS
+            case MMC_GET_SDSTAT :                     // Receive SD status as a data block (64 bytes)
+                if (send_cmd(ACMD13, 0) == 0)         // SD_STATUS
                 {
                     spiTransfer(SDCARD_SPI, 0xFF);
 
@@ -839,12 +843,12 @@ DWORD get_fattime(void)
     RTC_GetTime(RTC_Format_BIN, &RTC_TimeStructure);
     RTC_GetDate(RTC_Format_BIN, &RTC_DateStructure);
 
-    res = (((DWORD)  RTC_DateStructure.RTC_Year + 20) << 25)  // bit31:25		Year from 1980 (0..127)
-          | ((DWORD) RTC_DateStructure.RTC_Month << 21)       // bit24:21		Month          (1..12)
-          | ((DWORD) RTC_DateStructure.RTC_Date << 16)        // bit20:16		Day in month   (1..31)
-          |   (WORD)(RTC_TimeStructure.RTC_Hours << 11)       // bit15:11		Hour           (0..23)
-          |   (WORD)(RTC_TimeStructure.RTC_Minutes << 5)      // bit10:5		Minute         (0..59)
-          |   (WORD)(RTC_TimeStructure.RTC_Seconds >> 1);     // bit4:0	    	Second / 2     (0..29)
+    res = (((DWORD)  RTC_DateStructure.RTC_Year + 20) << 25)  // bit31:25       Year from 1980 (0..127)
+          | ((DWORD) RTC_DateStructure.RTC_Month << 21)       // bit24:21       Month          (1..12)
+          | ((DWORD) RTC_DateStructure.RTC_Date << 16)        // bit20:16       Day in month   (1..31)
+          | (WORD)(RTC_TimeStructure.RTC_Hours << 11)         // bit15:11       Hour           (0..23)
+          | (WORD)(RTC_TimeStructure.RTC_Minutes << 5)        // bit10:5        Minute         (0..59)
+          | (WORD)(RTC_TimeStructure.RTC_Seconds >> 1);       // bit4:0         Second / 2     (0..29)
 
     return res;
 }

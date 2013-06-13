@@ -64,8 +64,8 @@ void computeAxisCommands(float dt)
 
     if (flightMode >= ATTITUDE)
     {
-        attPID[ROLL]  = updatePID( attCmd[ROLL ],  sensors.attitude500Hz[ROLL ], dt, holdIntegrators, &eepromConfig.PID[ROLL_ATT_PID ] );
-        attPID[PITCH] = updatePID( attCmd[PITCH], -sensors.attitude500Hz[PITCH], dt, holdIntegrators, &eepromConfig.PID[PITCH_ATT_PID] );
+        attPID[ROLL]  = updatePID(attCmd[ROLL ],  sensors.attitude500Hz[ROLL ], dt, holdIntegrators, &eepromConfig.PID[ROLL_ATT_PID ]);
+        attPID[PITCH] = updatePID(attCmd[PITCH], -sensors.attitude500Hz[PITCH], dt, holdIntegrators, &eepromConfig.PID[PITCH_ATT_PID]);
     }
 
     if (flightMode == RATE)
@@ -88,7 +88,8 @@ void computeAxisCommands(float dt)
             setPIDintegralError(HEADING_PID, 0.0f);  // First pass heading hold engaged
             setPIDstates(YAW_RATE_PID,       0.0f);
         }
-        rateCmd[YAW] = updatePID( headingReference, heading.mag, dt, holdIntegrators, &eepromConfig.PID[HEADING_PID] );
+
+        rateCmd[YAW] = updatePID(headingReference, heading.mag, dt, holdIntegrators, &eepromConfig.PID[HEADING_PID]);
     }
     else  // Heading Hold is OFF
     {
@@ -96,19 +97,19 @@ void computeAxisCommands(float dt)
         headingReference = heading.mag;
     }
 
-    if (previousHeadingHoldEngaged == true && headingHoldEngaged ==false)
-    	{
-    	    setPIDintegralError(HEADING_PID, 0.0f);  // First pass heading hold disengaged
-    	    setPIDstates(YAW_RATE_PID,       0.0f);
-    	}
+    if (previousHeadingHoldEngaged == true && headingHoldEngaged == false)
+    {
+        setPIDintegralError(HEADING_PID, 0.0f);  // First pass heading hold disengaged
+        setPIDstates(YAW_RATE_PID,       0.0f);
+    }
 
     previousHeadingHoldEngaged = headingHoldEngaged;
 
     ///////////////////////////////////
 
-    axisPID[ROLL ] = updatePID( rateCmd[ROLL ],  sensors.gyro500Hz[ROLL ], dt, holdIntegrators, &eepromConfig.PID[ROLL_RATE_PID ] );
-    axisPID[PITCH] = updatePID( rateCmd[PITCH], -sensors.gyro500Hz[PITCH], dt, holdIntegrators, &eepromConfig.PID[PITCH_RATE_PID] );
-    axisPID[YAW  ] = updatePID( rateCmd[YAW  ],  sensors.gyro500Hz[YAW  ], dt, holdIntegrators, &eepromConfig.PID[YAW_RATE_PID  ] );
+    axisPID[ROLL ] = updatePID(rateCmd[ROLL ],  sensors.gyro500Hz[ROLL ], dt, holdIntegrators, &eepromConfig.PID[ROLL_RATE_PID ]);
+    axisPID[PITCH] = updatePID(rateCmd[PITCH], -sensors.gyro500Hz[PITCH], dt, holdIntegrators, &eepromConfig.PID[PITCH_RATE_PID]);
+    axisPID[YAW  ] = updatePID(rateCmd[YAW  ],  sensors.gyro500Hz[YAW  ], dt, holdIntegrators, &eepromConfig.PID[YAW_RATE_PID  ]);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

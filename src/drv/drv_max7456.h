@@ -122,6 +122,6 @@ void downloadMax7456Font(void);
 // Write Characters
 ///////////////////////////////////////////////////////////////////////////////
 
-void writeMax7456Chars( const char* buf, uint8_t len, uint8_t flags, uint8_t y, uint8_t x);
+void writeMax7456Chars(const char *buf, uint8_t len, uint8_t flags, uint8_t y, uint8_t x);
 
 ///////////////////////////////////////////////////////////////////////////////

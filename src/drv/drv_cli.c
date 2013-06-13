@@ -48,25 +48,25 @@ void cliInit(void)
 {
     GPIO_InitTypeDef  GPIO_InitStructure;
 
-	GPIO_StructInit(&GPIO_InitStructure);
+    GPIO_StructInit(&GPIO_InitStructure);
 
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
 
     GPIO_InitStructure.GPIO_Pin   = USB_DISCONNECT_PIN;
-	GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_OUT;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
-  //GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_NOPULL;
+    GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_OUT;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
+    //GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_NOPULL;
 
-	GPIO_Init(USB_DISCONNECT_GPIO, &GPIO_InitStructure);
+    GPIO_Init(USB_DISCONNECT_GPIO, &GPIO_InitStructure);
 
-	GPIO_ResetBits(USB_DISCONNECT_GPIO, USB_DISCONNECT_PIN);
+    GPIO_ResetBits(USB_DISCONNECT_GPIO, USB_DISCONNECT_PIN);
 
     delay(200);
 
-	GPIO_SetBits(USB_DISCONNECT_GPIO, USB_DISCONNECT_PIN);
+    GPIO_SetBits(USB_DISCONNECT_GPIO, USB_DISCONNECT_PIN);
 
-	USBD_Init(&USB_OTG_dev,	USB_OTG_FS_CORE_ID, &USR_desc, &USBD_CDC_cb, &USR_cb);
+    USBD_Init(&USB_OTG_dev, USB_OTG_FS_CORE_ID, &USR_desc, &USBD_CDC_cb, &USR_cb);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -74,9 +74,9 @@ void cliInit(void)
 uint8_t cliAvailable(void)
 {
     if (cdc_RX_IsCharReady() == -1)
-    	return(true);
+        return(true);
     else
-    	return(false);
+        return(false);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -91,12 +91,12 @@ char cliRead(void)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void cliPrint(char* str)
+void cliPrint(char *str)
 {
-	if (usbDeviceConfigured == true)
-	{
-		cdc_DataTx((unsigned char*)str, strlen(str));
-	}
+    if (usbDeviceConfigured == true)
+    {
+        cdc_DataTx((unsigned char *)str, strlen(str));
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -104,16 +104,16 @@ void cliPrint(char* str)
 // From Ala42
 ///////////////////////////////////////////////////////////////////////////////
 
-void cliPrintF(const char * fmt, ...)
+void cliPrintF(const char *fmt, ...)
 {
-	char buf[256];
+    char buf[256];
 
-	va_list  vlist;
-	va_start (vlist, fmt);
+    va_list  vlist;
+    va_start(vlist, fmt);
 
-	vsnprintf(buf, sizeof(buf), fmt, vlist);
-	cliPrint(buf);
-	va_end(vlist);
+    vsnprintf(buf, sizeof(buf), fmt, vlist);
+    cliPrint(buf);
+    va_end(vlist);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

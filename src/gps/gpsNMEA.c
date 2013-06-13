@@ -46,7 +46,7 @@
 // GPS Variables
 ///////////////////////////////////////////////////////////////////////////////
 
-static const char nib2hex[16] = { '0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
+static const char nib2hex[16] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
 char    sentenceBuffer[SENTENCE_SIZE + 1];
 uint8_t sentenceLength = 0;
@@ -68,22 +68,23 @@ uint8_t nmeaGetScaledInt(char **s, long *out, uint8_t decimals)
     int32_t val = 0;
 
     // read whole numbers (prior to dot)
-    while (((**s)>='0') && ((**s) <= '9'))
+    while (((**s) >= '0') && ((**s) <= '9'))
     {
         val *= 10;
         val = val + (*((*s)++) - '0');
         ret = 1;
     }
 
-    if ((**s)=='.')
+    if ((**s) == '.')
     {
         // we have decimals
         (*s)++;
 
-        while  (decimals--)
+        while (decimals--)
         {
             val *= 10;
-            if (((**s)>='0') && ((**s) <= '9'))
+
+            if (((**s) >= '0') && ((**s) <= '9'))
             {
                 val += (*((*s)++) - '0');
                 ret = 1;
@@ -92,12 +93,12 @@ uint8_t nmeaGetScaledInt(char **s, long *out, uint8_t decimals)
     }
     else
     {
-        while  (decimals--)
-          val *= 10;
+        while (decimals--)
+            val *= 10;
     }
 
     // take off the decimals we did not care about
-    while (((**s)>='0') && ((**s) <= '9'))
+    while (((**s) >= '0') && ((**s) <= '9'))
         (*s)++;
 
     if ((**s) == ',')
@@ -106,7 +107,7 @@ uint8_t nmeaGetScaledInt(char **s, long *out, uint8_t decimals)
         ret = 0; // no comma -> fail
 
     if (ret && out)
-        *out=val;
+        *out = val;
 
     return ret;
 }
@@ -148,12 +149,14 @@ uint8_t nmeaGetLatLong(char **s, long *outp, uint8_t decimals)
         if ((**s) == ',')
         {
             (*s)++;
+
             if (outp) *outp = deg;
+
             return 1;
         }
     }
 
-    if ((**s) == ',') (*s)++; // consume the second comma if no number parsed
+    if ((**s) == ',')(*s)++;  // consume the second comma if no number parsed
 
     return 0;
 }
@@ -169,7 +172,7 @@ void nmeaProcessSentence()
 
     ///////////////////////////////////
 
-    if (!strncmp(p,"GPGGA,",6))
+    if (!strncmp(p, "GPGGA,", 6))
     {
         // MediaTek Example: $GPGGA,064951.000,2307.1256,N,12016.4438,E,1,8,0.95,39.9,M,17.8,M,,*65
         // Ublox Example   : $GPGGA,092725.00,4717.11399,N,00833.91590,E,1,08,1.01,499.6,M,48.0,M,,*5B
@@ -190,7 +193,7 @@ void nmeaProcessSentence()
 
     ///////////////////////////////////
 
-    else if (!strncmp(p,"GPGSA,",6))
+    else if (!strncmp(p, "GPGSA,", 6))
     {
         // MediaTek Example: $GPGSA,A,3,29,21,26,15,18,09,06,10,,,,,2.32,0.95,2.11*00
         // Ublox Example   : $GPGSA,A,3,23,29,07,08,09,18,26,28,,,,,1.94,1.18,1.54*0D
@@ -204,7 +207,7 @@ void nmeaProcessSentence()
 
     ///////////////////////////////////
 
-    else if (!strncmp(p,"GPRMC,",6))
+    else if (!strncmp(p, "GPRMC,", 6))
     {
         // MediaTek Example: $GPRMC,064951.000,A,2307.1256,N,12016.4438,E,0.03,165.48,260406,3.05,W,A*2C
         // Ublox Example   : $GPRMC,083559.00,A,4717.11437,N,00833.91522,E,0.004,77.52,091202,,,A*57
@@ -240,7 +243,7 @@ uint8_t decodeNMEAsentence(void)
 
     for (i = 0; i < numberOfChars; i++)
     {
-		data = gpsRead();
+        data = gpsRead();
 
         switch (nmeaProcessDataState)
         {
@@ -251,6 +254,7 @@ uint8_t decodeNMEAsentence(void)
                     sentenceLength        = 0;
                     sentenceCalculatedXOR = 0;
                 }
+
                 break;
 
             case READ:
@@ -269,10 +273,11 @@ uint8_t decodeNMEAsentence(void)
                     // overrun !!
                     nmeaProcessDataState = WAIT_START;
                 }
+
                 break;
 
             case READ_CS1:
-                if (data == nib2hex[sentenceCalculatedXOR>>4])
+                if (data == nib2hex[sentenceCalculatedXOR >> 4])
                     nmeaProcessDataState = READ_CS2;
                 else
                     nmeaProcessDataState = WAIT_START;

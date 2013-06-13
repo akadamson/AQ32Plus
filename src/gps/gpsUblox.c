@@ -43,7 +43,7 @@
 // UBLOX binary message definitions
 struct ublox_NAV_POSLLH  // 01 02 (28)
 {
-	uint32_t iTow;
+    uint32_t iTow;
     int32_t  lon;    // 1e-7 degrees
     int32_t  lat;    // 1e-7 degrees
     int32_t  height; // mm
@@ -65,19 +65,19 @@ struct ublox_NAV_STATUS  // 01 03 (16)
 
 struct ublox_NAV_DOP  // 01 04 (18)
 {
-	uint32_t iTow;
-	uint16_t gDOP;
-	uint16_t pDOP;
-	uint16_t tDOP;
-	uint16_t vDOP;
-	uint16_t hDOP;
-	uint16_t nDOP;
-	uint16_t eDOP;
+    uint32_t iTow;
+    uint16_t gDOP;
+    uint16_t pDOP;
+    uint16_t tDOP;
+    uint16_t vDOP;
+    uint16_t hDOP;
+    uint16_t nDOP;
+    uint16_t eDOP;
 };
 
 struct ublox_NAV_SOL  // 01 06 (52)
 {
-	uint32_t iTow;
+    uint32_t iTow;
     int32_t  fTow;
     int16_t  week;
     uint8_t  gspFix;
@@ -98,7 +98,7 @@ struct ublox_NAV_SOL  // 01 06 (52)
 
 struct ublox_NAV_VELNED  // 01 18 (36)
 {
-	uint32_t iTow;
+    uint32_t iTow;
     int32_t  velN;    // cm/s
     int32_t  velE;    // cm/s
     int32_t  velD;    // cm/s
@@ -136,8 +136,8 @@ union ublox_message
 
 uint8_t ubloxExpectedDataLength;
 uint8_t ubloxDataLength;
-uint8_t ubloxClass,ubloxId;
-uint8_t ubloxCKA,ubloxCKB;
+uint8_t ubloxClass, ubloxId;
+uint8_t ubloxCKA, ubloxCKB;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Decode Data Parse
@@ -172,9 +172,9 @@ void ubloxParseData()
         }
         else if (ubloxId == 4)   // NAV:DOP
         {
-		    sensors.gpsHdop    = (float)ubloxMessage.nav_dop.hDOP * 0.01f;
-		}
-		else if (ubloxId == 6)   // NAV:SOL
+            sensors.gpsHdop    = (float)ubloxMessage.nav_dop.hDOP * 0.01f;
+        }
+        else if (ubloxId == 6)   // NAV:SOL
         {
             sensors.gpsNumSats = ubloxMessage.nav_sol.numSV;
         }
@@ -185,15 +185,15 @@ void ubloxParseData()
         }
         else if (ubloxId == 33)  // NAV:TIMEUTC
         {
-			sensors.gpsTime = (float)(ubloxMessage.nav_timeutc.hour * 10000 +
-			                          ubloxMessage.nav_timeutc.min  * 100   +
-			                          ubloxMessage.nav_timeutc.sec        ) +
-			                  (float)(ubloxMessage.nav_timeutc.nano) * 0.000000001f;
+            sensors.gpsTime = (float)(ubloxMessage.nav_timeutc.hour * 10000 +
+                                      ubloxMessage.nav_timeutc.min  * 100   +
+                                      ubloxMessage.nav_timeutc.sec) +
+                              (float)(ubloxMessage.nav_timeutc.nano) * 0.000000001f;
 
-			sensors.gpsDate = ubloxMessage.nav_timeutc.day   * 10000 +
-			                  ubloxMessage.nav_timeutc.month * 100   +
-			                  ubloxMessage.nav_timeutc.year  - 2000;
-		}
+            sensors.gpsDate = ubloxMessage.nav_timeutc.day   * 10000 +
+                              ubloxMessage.nav_timeutc.month * 100   +
+                              ubloxMessage.nav_timeutc.year  - 2000;
+        }
     }
 }
 
@@ -212,11 +212,11 @@ uint8_t decodeUbloxMsg(void)
 
     for (i = 0; i < numberOfChars; i++)
     {
-		data = gpsRead();
+        data = gpsRead();
 
         switch (ubloxProcessDataState)
         {
-            ///////////////////////////
+                ///////////////////////////
 
             case WAIT_SYNC1:
                 if (data == 0xb5)
@@ -224,7 +224,7 @@ uint8_t decodeUbloxMsg(void)
 
                 break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case WAIT_SYNC2:
                 if (data == 0x62)
@@ -234,7 +234,7 @@ uint8_t decodeUbloxMsg(void)
 
                 break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case GET_CLASS:
                 ubloxClass            = data;
@@ -244,7 +244,7 @@ uint8_t decodeUbloxMsg(void)
 
                 break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case GET_ID:
                 ubloxId               = data;
@@ -254,7 +254,7 @@ uint8_t decodeUbloxMsg(void)
 
                 break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case GET_LL:
                 ubloxExpectedDataLength = data;
@@ -264,7 +264,7 @@ uint8_t decodeUbloxMsg(void)
 
                 break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case GET_LH:
                 ubloxExpectedDataLength += data << 8;
@@ -280,7 +280,7 @@ uint8_t decodeUbloxMsg(void)
 
                 break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case GET_DATA:
                 ubloxCKA += data;
@@ -295,17 +295,17 @@ uint8_t decodeUbloxMsg(void)
 
                 break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case GET_CKA:
                 if (ubloxCKA != data)
                     ubloxProcessDataState = WAIT_SYNC1;
-	            else
+                else
                     ubloxProcessDataState = GET_CKB;
 
                 break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case GET_CKB:
                 if (ubloxCKB == data)
@@ -313,25 +313,26 @@ uint8_t decodeUbloxMsg(void)
                     parsed = 1;
                     ubloxParseData();
                 }
-			    else
-			    {
-					sensors.gpsLatitude    = GPS_INVALID_ANGLE;
-					sensors.gpsLongitude   = GPS_INVALID_ANGLE;
-					sensors.gpsAltitude	   = GPS_INVALID_ALTITUDE;
-					sensors.gpsGroundSpeed = GPS_INVALID_SPEED;
-					sensors.gpsGroundTrack = GPS_INVALID_ANGLE;
-					sensors.gpsNumSats     = GPS_INVALID_SATS;
-					sensors.gpsFix         = GPS_INVALID_FIX;
-					sensors.gpsDate        = GPS_INVALID_DATE;
-					sensors.gpsTime        = GPS_INVALID_TIME;
-					sensors.gpsHdop        = GPS_INVALID_HDOP;
-				}
+                else
+                {
+                    sensors.gpsLatitude    = GPS_INVALID_ANGLE;
+                    sensors.gpsLongitude   = GPS_INVALID_ANGLE;
+                    sensors.gpsAltitude    = GPS_INVALID_ALTITUDE;
+                    sensors.gpsGroundSpeed = GPS_INVALID_SPEED;
+                    sensors.gpsGroundTrack = GPS_INVALID_ANGLE;
+                    sensors.gpsNumSats     = GPS_INVALID_SATS;
+                    sensors.gpsFix         = GPS_INVALID_FIX;
+                    sensors.gpsDate        = GPS_INVALID_DATE;
+                    sensors.gpsTime        = GPS_INVALID_TIME;
+                    sensors.gpsHdop        = GPS_INVALID_HDOP;
+                }
 
                 ubloxProcessDataState = WAIT_SYNC1;
 
                 break;
         }
     }
+
     return parsed;
 }
 

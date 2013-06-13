@@ -4,14 +4,14 @@
  **  File        : FileUtils.c
  **
  **  Abstract    : Fonction permettant de manipuler des fichiers (Read/Write) avec la
- **  			   bibliothèque FatFs
+ **                bibliothèque FatFs
  **
  **  Environment : Atollic TrueSTUDIO(R)
  **                STMicroelectronics STM32F4xx Standard Peripherals Library
  **
- **  Author 	 : Ronan Douguet
+ **  Author      : Ronan Douguet
  **
- **  Date	     : 08-03-2012
+ **  Date        : 08-03-2012
  **
  ********************************************************************************
  */
@@ -23,32 +23,32 @@
 
 
 /*-----------------------------------------------------------------------*/
-/* @descr  die          						 						 */
-/* @param  none															 */
-/* @retval none					 										 */
+/* @descr  die                                                           */
+/* @param  none                                                          */
+/* @retval none                                                          */
 /*-----------------------------------------------------------------------*/
 void die(   /* Stop with dying message */
-    FRESULT rc	/* FatFs return value */
+    FRESULT rc  /* FatFs return value */
 )
 {
     // HJI USART_SendString(USART3, "Failed with rc=%u.\n");
-	  cliPrintF("Failed withrc = %u.\n");
+    cliPrintF("Failed withrc = %u.\n");
 
     for (;;) ;
 }
 
 
 /*-----------------------------------------------------------------------*/
-/* @descr  CREATE FILE   						 						 */
-/* @param  none															 */
-/* @retval none					 										 */
+/* @descr  CREATE FILE                                                   */
+/* @param  none                                                          */
+/* @retval none                                                          */
 /*-----------------------------------------------------------------------*/
 void CreateFile(void)
 {
     /* varibles pour tester l'ecriture en FAT32 */
-    FRESULT rc;				/* Result code */
-    FIL Fil;			/* File object */
-    FATFS Fatfs;		/* File system object */
+    FRESULT rc;             /* Result code */
+    FIL Fil;            /* File object */
+    FATFS Fatfs;        /* File system object */
 
     /* Register volume work area (never fails) */
     f_mount(0, &Fatfs);
@@ -84,9 +84,9 @@ void CreateFile(void)
 }
 
 /*-----------------------------------------------------------------------*/
-/* @descr  WRITE FILE   						 						 */
-/* @param  none															 */
-/* @retval none					 										 */
+/* @descr  WRITE FILE                                                    */
+/* @param  none                                                          */
+/* @retval none                                                          */
 /*-----------------------------------------------------------------------*/
 void WriteFile(void)
 {
@@ -100,9 +100,9 @@ void WriteFile(void)
 
 
     /* varibles pour tester l'ecriture en FAT32 */
-    FRESULT rc;				/* Result code */
-    FIL Fil;			/* File object */
-    FATFS Fatfs;		/* File system object */
+    FRESULT rc;             /* Result code */
+    FIL Fil;            /* File object */
+    FATFS Fatfs;        /* File system object */
 
     /* Register volume work area (never fails) */
     f_mount(0, &Fatfs);
@@ -118,8 +118,8 @@ void WriteFile(void)
     /* Ecriture de la Date,Heure,AN0 et AN1 dans le fichier */
     sec_frac = RTC_GetSubSecond();
     time_ms = (249.00 - sec_frac) / 250;
-    sprintf(time_ms_ascii,"%f", time_ms);
-    sprintf(time_dms_ascii,"%.1f", time_ms);
+    sprintf(time_ms_ascii, "%f", time_ms);
+    sprintf(time_dms_ascii, "%.1f", time_ms);
     // HJI sprintf(time_dms_ascii, "%d", (float)0.2);
     // HJI sprintf(time_dms_ascii, "%d", (float)12.33);
     RTC_GetTime(RTC_Format_BIN, &RTC_TimeStructure);
@@ -137,16 +137,16 @@ void WriteFile(void)
 }
 
 /*-----------------------------------------------------------------------*/
-/* @descr  READ FILE   						 						 */
-/* @param  none															 */
-/* @retval none					 										 */
+/* @descr  READ FILE                                                 */
+/* @param  none                                                          */
+/* @retval none                                                          */
 /*-----------------------------------------------------------------------*/
 void ReadFile(void)
 {
     /* varibles pour tester l'ecriture en FAT32 */
-    FRESULT rc;				/* Result code */
-    FIL Fil;			/* File object */
-    FATFS Fatfs;		/* File system object */
+    FRESULT rc;             /* Result code */
+    FIL Fil;            /* File object */
+    FATFS Fatfs;        /* File system object */
     char ligne[8];
 
     /* Register volume work area (never fails) */

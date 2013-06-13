@@ -78,16 +78,16 @@ void spiWriteMax7456Register(uint8_t r, uint8_t d)
 
 void hideOSD()
 {
-  if (!osdDisabled)
-  {
-    ENABLE_MAX7456;
+    if (!osdDisabled)
+    {
+        ENABLE_MAX7456;
 
-    spiWriteMax7456Register(VM0_REG, disableDisplay);
+        spiWriteMax7456Register(VM0_REG, disableDisplay);
 
-    DISABLE_MAX7456;
+        DISABLE_MAX7456;
 
-    osdDisabled = true;
-  }
+        osdDisabled = true;
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -96,16 +96,16 @@ void hideOSD()
 
 void unhideOSD()
 {
-  if (osdDisabled)
-  {
-    ENABLE_MAX7456;
+    if (osdDisabled)
+    {
+        ENABLE_MAX7456;
 
-    spiWriteMax7456Register(VM0_REG, enableDisplay);
+        spiWriteMax7456Register(VM0_REG, enableDisplay);
 
-    DISABLE_MAX7456;
+        DISABLE_MAX7456;
 
-    osdDisabled = false;
-  }
+        osdDisabled = false;
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -118,7 +118,7 @@ void unhideOSD()
 // - buf=NULL or len>strlen(buf) can be used to write zeroes (clear)
 // - flags: 0x01 blink, 0x02 invert (can be combined)
 
-void writeMax7456Chars( const char* buf, uint8_t len, uint8_t flags, uint8_t y, uint8_t x)
+void writeMax7456Chars(const char *buf, uint8_t len, uint8_t flags, uint8_t y, uint8_t x)
 {
     uint8_t  i;
     uint16_t offset = y * 30 + x;
@@ -132,8 +132,8 @@ void writeMax7456Chars( const char* buf, uint8_t len, uint8_t flags, uint8_t y, 
     spiWriteMax7456Register(DMM_REG, ((flags & 1) ? 0x10 : 0x00) | ((flags & 2) ? 0x08 : 0x00) | ((len != 1) ? 0x01 : 0x00));
 
     // send starting display memory address (position of text)
-    spiWriteMax7456Register(DMAH_REG, offset >> 8 );
-    spiWriteMax7456Register(DMAL_REG, offset & 0xFF );
+    spiWriteMax7456Register(DMAH_REG, offset >> 8);
+    spiWriteMax7456Register(DMAL_REG, offset & 0xFF);
 
     // write out data
     for (i = 0; i < len; i++)
@@ -233,8 +233,8 @@ void initMax7456()
     //Set white level to 90% for all rows
     ENABLE_MAX7456;
 
-    for(i = 0; i < maxScreenRows; i++ )
-        spiWriteMax7456Register(RB0_REG + i, WHITE_LEVEL_90 );
+    for (i = 0; i < maxScreenRows; i++)
+        spiWriteMax7456Register(RB0_REG + i, WHITE_LEVEL_90);
 
     //ensure device is enabled
     spiWriteMax7456Register(VM0_REG, enableDisplay);
@@ -305,11 +305,11 @@ void showMax7456Font(void) //show all chars on 24 wide grid
     {
         spiWriteMax7456Register(DMDI_REG, x);
 
-        if ((x%24)==23)
+        if ((x % 24) == 23)
         {
             for (i = 0; i < 6; i++)
                 spiWriteMax7456Register(DMDI_REG, 0);
-		}
+        }
     }
 
     spiWriteMax7456Register(DMDI_REG, END_STRING);
@@ -343,11 +343,11 @@ void writeNVMcharacter(uint8_t ch, const uint16_t index)
 
     spiWriteMax7456Register(CMAH_REG, ch);  // set start address high
 
-    for(x = 0; x < NVM_RAM_SIZE; x++) // write out 54 (out of 64) bytes of character to shadow ram
+    for (x = 0; x < NVM_RAM_SIZE; x++) // write out 54 (out of 64) bytes of character to shadow ram
     {
         spiWriteMax7456Register(CMAL_REG, x); // set start address low
 
-        spiWriteMax7456Register(CMDI_REG, fontdata[index+x]);
+        spiWriteMax7456Register(CMDI_REG, fontdata[index + x]);
     }
 
     // transfer a 54 bytes from shadow ram to NVM
@@ -368,7 +368,7 @@ void downloadMax7456Font(void)
 {
     uint16_t ch;
 
-    if (sizeof(fontdata)!=16384)
+    if (sizeof(fontdata) != 16384)
     {
         cliPrint("\nERROR: fontdata with invalid size, aborting!!!\n\n");
         return;
@@ -379,7 +379,7 @@ void downloadMax7456Font(void)
     for (ch = 0; ch < 256; ch++)
     {
         cliPrintF("%d3", ch);
-        writeNVMcharacter(ch, 64*ch);
+        writeNVMcharacter(ch, 64 * ch);
         delay(30);
         cliPrint(" Done\n");
     }

@@ -111,18 +111,18 @@ void adcInit(void)
     DMA_InitStructure.DMA_Channel            = DMA_Channel_1;
     DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)&ADC2->DR;
     DMA_InitStructure.DMA_Memory0BaseAddr    = (uint32_t)adc2ConvertedValues;
-  //DMA_InitStructure.DMA_DIR                = DMA_DIR_PeripheralToMemory;
+    //DMA_InitStructure.DMA_DIR                = DMA_DIR_PeripheralToMemory;
     DMA_InitStructure.DMA_BufferSize         = 16;
-  //DMA_InitStructure.DMA_PeripheralInc      = DMA_PeripheralInc_Disable;
+    //DMA_InitStructure.DMA_PeripheralInc      = DMA_PeripheralInc_Disable;
     DMA_InitStructure.DMA_MemoryInc          = DMA_MemoryInc_Enable;
     DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_HalfWord;
     DMA_InitStructure.DMA_MemoryDataSize     = DMA_MemoryDataSize_HalfWord;
     DMA_InitStructure.DMA_Mode               = DMA_Mode_Circular;
     DMA_InitStructure.DMA_Priority           = DMA_Priority_High;
-  //DMA_InitStructure.DMA_FIFOMode           = DMA_FIFOMode_Disable;
-  //DMA_InitStructure.DMA_FIFOThreshold      = DMA_FIFOThreshold_1QuarterFull;
-  //DMA_InitStructure.DMA_MemoryBurst        = DMA_MemoryBurst_Single;
-  //DMA_InitStructure.DMA_PeripheralBurst    = DMA_PeripheralBurst_Single;
+    //DMA_InitStructure.DMA_FIFOMode           = DMA_FIFOMode_Disable;
+    //DMA_InitStructure.DMA_FIFOThreshold      = DMA_FIFOThreshold_1QuarterFull;
+    //DMA_InitStructure.DMA_MemoryBurst        = DMA_MemoryBurst_Single;
+    //DMA_InitStructure.DMA_PeripheralBurst    = DMA_PeripheralBurst_Single;
 
     DMA_Init(DMA2_Stream2, &DMA_InitStructure);
 
@@ -132,37 +132,37 @@ void adcInit(void)
 
     GPIO_InitStructure.GPIO_Pin   = ADC1_PIN | ADC3_PIN;
     GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_AN;
-  //GPIO_InitStructure.GPIO_Speed = GPIO_Seed_2MHz;
-  //GPIO_InitStructrue.GPIO_OType = GPIO_OType_PP;
-  //GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_NOPULL ;
+    //GPIO_InitStructure.GPIO_Speed = GPIO_Seed_2MHz;
+    //GPIO_InitStructrue.GPIO_OType = GPIO_OType_PP;
+    //GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_NOPULL ;
 
     GPIO_Init(GPIOB, &GPIO_InitStructure);
 
     GPIO_InitStructure.GPIO_Pin   = ADC2_PIN | VBATT_PIN;
-  //GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_AN;
-  //GPIO_InitStructure.GPIO_Speed = GPIO_Seed_2MHz;
-  //GPIO_InitStructrue.GPIO_OType = GPIO_OType_PP;
-  //GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_NOPULL ;
+    //GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_AN;
+    //GPIO_InitStructure.GPIO_Speed = GPIO_Seed_2MHz;
+    //GPIO_InitStructrue.GPIO_OType = GPIO_OType_PP;
+    //GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_NOPULL ;
 
     GPIO_Init(GPIOC, &GPIO_InitStructure);
 
     ///////////////////////////////////
 
-  //ADC_CommonInitStructure.ADC_Mode             = ADC_Mode_Independent;
+    //ADC_CommonInitStructure.ADC_Mode             = ADC_Mode_Independent;
     ADC_CommonInitStructure.ADC_Prescaler        = ADC_Prescaler_Div4;            // PCLK2 = 42 MHz, ADCCLK = 10.5 MHz
-  //ADC_CommonInitStructure.ADC_DMAAccessMode    = ADC_DMAAccessMode_Disabled;
-  //ADC_CommonInitStructure.ADC_TwoSamplingDelay = ADC_TwoSamplingDelay_5Cycles;
+    //ADC_CommonInitStructure.ADC_DMAAccessMode    = ADC_DMAAccessMode_Disabled;
+    //ADC_CommonInitStructure.ADC_TwoSamplingDelay = ADC_TwoSamplingDelay_5Cycles;
 
     ADC_CommonInit(&ADC_CommonInitStructure);
 
     ///////////////////////////////////
 
-  //ADC_InitStructure.ADC_Resolution           = ADC_Resolution_12b;
+    //ADC_InitStructure.ADC_Resolution           = ADC_Resolution_12b;
     ADC_InitStructure.ADC_ScanConvMode         = ENABLE;
     ADC_InitStructure.ADC_ContinuousConvMode   = ENABLE;
-  //ADC_InitStructure.ADC_ExternalTrigConvEdge = ADC_ExternalTrigConvEdge_None;
-  //ADC_InitStructure.ADC_ExternalTrigConv     = ADC_ExternalTrigConv_T1_CC1;
-  //ADC_InitStructure.ADC_DataAlign            = ADC_DataAlign_Right;
+    //ADC_InitStructure.ADC_ExternalTrigConvEdge = ADC_ExternalTrigConvEdge_None;
+    //ADC_InitStructure.ADC_ExternalTrigConv     = ADC_ExternalTrigConv_T1_CC1;
+    //ADC_InitStructure.ADC_DataAlign            = ADC_DataAlign_Right;
     ADC_InitStructure.ADC_NbrOfConversion      = 16;
 
     ADC_Init(ADC2, &ADC_InitStructure);
@@ -201,13 +201,13 @@ void adcInit(void)
 
 float mxr9150Xaxis(void)
 {
-	uint8_t  i;
-	uint16_t adcSum = 0;
+    uint8_t  i;
+    uint16_t adcSum = 0;
 
-	for (i = MXR9150_XAXIS_CONVERTED_VALUE; i < MXR9150_XAXIS_CONVERTED_VALUE + 13; i += 3)
-	    adcSum += adc2ConvertedValues[i];
+    for (i = MXR9150_XAXIS_CONVERTED_VALUE; i < MXR9150_XAXIS_CONVERTED_VALUE + 13; i += 3)
+        adcSum += adc2ConvertedValues[i];
 
-	return (float)adcSum / 5.0f;
+    return (float)adcSum / 5.0f;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -216,13 +216,13 @@ float mxr9150Xaxis(void)
 
 float mxr9150Yaxis(void)
 {
-	uint8_t  i;
-	uint16_t adcSum = 0;
+    uint8_t  i;
+    uint16_t adcSum = 0;
 
-	for (i = MXR9150_YAXIS_CONVERTED_VALUE; i < MXR9150_YAXIS_CONVERTED_VALUE + 13; i += 3)
-	    adcSum += adc2ConvertedValues[i];
+    for (i = MXR9150_YAXIS_CONVERTED_VALUE; i < MXR9150_YAXIS_CONVERTED_VALUE + 13; i += 3)
+        adcSum += adc2ConvertedValues[i];
 
-	return (float)adcSum / 5.0f;
+    return (float)adcSum / 5.0f;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -231,13 +231,13 @@ float mxr9150Yaxis(void)
 
 float mxr9150Zaxis(void)
 {
-	uint8_t  i;
-	uint16_t adcSum = 0;
+    uint8_t  i;
+    uint16_t adcSum = 0;
 
-	for (i = MXR9150_ZAXIS_CONVERTED_VALUE; i < MXR9150_ZAXIS_CONVERTED_VALUE + 13; i += 3)
-	    adcSum += adc2ConvertedValues[i];
+    for (i = MXR9150_ZAXIS_CONVERTED_VALUE; i < MXR9150_ZAXIS_CONVERTED_VALUE + 13; i += 3)
+        adcSum += adc2ConvertedValues[i];
 
-	return (float)adcSum / 5.0f;
+    return (float)adcSum / 5.0f;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -246,7 +246,7 @@ float mxr9150Zaxis(void)
 
 float batteryVoltage(void)
 {
-	return (float)adc2ConvertedValues[VBATT_CONVERTED_VALUE] * VOLTS_PER_BIT * eepromConfig.batteryVoltageDivider;
+    return (float)adc2ConvertedValues[VBATT_CONVERTED_VALUE] * VOLTS_PER_BIT * eepromConfig.batteryVoltageDivider;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

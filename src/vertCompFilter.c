@@ -53,13 +53,13 @@ uint8_t previousExecUp  = false;
 void vertCompFilter(float dt)
 {
     if ((execUp == true) && (previousExecUp == false))
-    	hEstimate = sensors.pressureAlt50Hz;
+        hEstimate = sensors.pressureAlt50Hz;
 
     previousExecUp = execUp;
 
-	if (execUp == true)
+    if (execUp == true)
     {
-    	accelZ = -earthAxisAccels[ZAXIS] + eepromConfig.compFilterB * estimationError;
+        accelZ = -earthAxisAccels[ZAXIS] + eepromConfig.compFilterB * estimationError;
 
         hDotEstimate += accelZ * dt;
 

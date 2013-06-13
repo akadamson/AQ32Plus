@@ -50,33 +50,33 @@
 ///////////////////////////////////////
 
 #if defined(HMC5883L_ONBOARD)
-    #define HMC5883L_I2C I2C1
+#define HMC5883L_I2C I2C1
 #elif defined(HMC5883L_EXTERNAL)
-    #define HMC5883L_I2C I2C2
+#define HMC5883L_I2C I2C2
 #else
-    #error "No HMC5883L Definition!!"
+#error "No HMC5883L Definition!!"
 #endif
 
 ///////////////////////////////////////
 
 #if defined(MS5611_ONBOARD)
-    #define MS5611_I2C     I2C1
-    #define MS5611_ADDRESS 0x76
+#define MS5611_I2C     I2C1
+#define MS5611_ADDRESS 0x76
 #elif defined(MS5611_EXTERNAL)
-    #define MS5611_I2C     I2C2
-    #define MS5611_ADDRESS 0x77
+#define MS5611_I2C     I2C2
+#define MS5611_ADDRESS 0x77
 #else
-    #error "No MS5611 Definition!!"
+#error "No MS5611 Definition!!"
 #endif
 
 ///////////////////////////////////////
 
 #if defined(MPU_ACCEL) && defined(MXR_ACCEL)
-    #error "Can't define both MPU_ACCEL and MXR_ACCEL!!"
+#error "Can't define both MPU_ACCEL and MXR_ACCEL!!"
 #endif
 
 #if !defined(MPU_ACCEL) && !defined(MXR_ACCEL)
-    #error "Must define MPU_ACCEL or MXR_ACCEL!!"
+#error "Must define MPU_ACCEL or MXR_ACCEL!!"
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

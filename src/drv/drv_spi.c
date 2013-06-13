@@ -331,7 +331,7 @@ uint8_t spiTransfer(SPI_TypeDef *SPIx, uint8_t data)
 
     while (SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_RXNE) == RESET)
         if ((spiTimeout--) == 0)
-    	    return(0);
+            return(0);
 
     return((uint8_t)SPI_I2S_ReceiveData(SPIx));
 }

@@ -156,17 +156,17 @@ void initFirstOrderFilter()
     ///////////////////////////////////
 
     firstOrderFilters[ACCEL500HZ_Y_LOWPASS].gx1 = ACCEL500HZ_Y_LOWPASS_GX1;
-	firstOrderFilters[ACCEL500HZ_Y_LOWPASS].gx2 = ACCEL500HZ_Y_LOWPASS_GX2;
-	firstOrderFilters[ACCEL500HZ_Y_LOWPASS].gx3 = ACCEL500HZ_Y_LOWPASS_GX3;
-	firstOrderFilters[ACCEL500HZ_Y_LOWPASS].previousInput  = 0.0f;
+    firstOrderFilters[ACCEL500HZ_Y_LOWPASS].gx2 = ACCEL500HZ_Y_LOWPASS_GX2;
+    firstOrderFilters[ACCEL500HZ_Y_LOWPASS].gx3 = ACCEL500HZ_Y_LOWPASS_GX3;
+    firstOrderFilters[ACCEL500HZ_Y_LOWPASS].previousInput  = 0.0f;
     firstOrderFilters[ACCEL500HZ_Y_LOWPASS].previousOutput = 0.0f;
 
     ///////////////////////////////////
 
     firstOrderFilters[ACCEL500HZ_Z_LOWPASS].gx1 = ACCEL500HZ_Z_LOWPASS_GX1;
-	firstOrderFilters[ACCEL500HZ_Z_LOWPASS].gx2 = ACCEL500HZ_Z_LOWPASS_GX2;
-	firstOrderFilters[ACCEL500HZ_Z_LOWPASS].gx3 = ACCEL500HZ_Z_LOWPASS_GX3;
-	firstOrderFilters[ACCEL500HZ_Z_LOWPASS].previousInput  = -accelOneG;
+    firstOrderFilters[ACCEL500HZ_Z_LOWPASS].gx2 = ACCEL500HZ_Z_LOWPASS_GX2;
+    firstOrderFilters[ACCEL500HZ_Z_LOWPASS].gx3 = ACCEL500HZ_Z_LOWPASS_GX3;
+    firstOrderFilters[ACCEL500HZ_Z_LOWPASS].previousInput  = -accelOneG;
     firstOrderFilters[ACCEL500HZ_Z_LOWPASS].previousOutput = -accelOneG;
 
     ///////////////////////////////////
@@ -180,49 +180,49 @@ void initFirstOrderFilter()
     ///////////////////////////////////
 
     firstOrderFilters[ACCEL100HZ_Y_LOWPASS].gx1 = ACCEL100HZ_Y_LOWPASS_GX1;
-	firstOrderFilters[ACCEL100HZ_Y_LOWPASS].gx2 = ACCEL100HZ_Y_LOWPASS_GX2;
-	firstOrderFilters[ACCEL100HZ_Y_LOWPASS].gx3 = ACCEL100HZ_Y_LOWPASS_GX3;
-	firstOrderFilters[ACCEL100HZ_Y_LOWPASS].previousInput  = 0.0f;
+    firstOrderFilters[ACCEL100HZ_Y_LOWPASS].gx2 = ACCEL100HZ_Y_LOWPASS_GX2;
+    firstOrderFilters[ACCEL100HZ_Y_LOWPASS].gx3 = ACCEL100HZ_Y_LOWPASS_GX3;
+    firstOrderFilters[ACCEL100HZ_Y_LOWPASS].previousInput  = 0.0f;
     firstOrderFilters[ACCEL100HZ_Y_LOWPASS].previousOutput = 0.0f;
 
     ///////////////////////////////////
 
     firstOrderFilters[ACCEL100HZ_Z_LOWPASS].gx1 = ACCEL100HZ_Z_LOWPASS_GX1;
-	firstOrderFilters[ACCEL100HZ_Z_LOWPASS].gx2 = ACCEL100HZ_Z_LOWPASS_GX2;
-	firstOrderFilters[ACCEL100HZ_Z_LOWPASS].gx3 = ACCEL100HZ_Z_LOWPASS_GX3;
-	firstOrderFilters[ACCEL100HZ_Z_LOWPASS].previousInput  = -accelOneG;
+    firstOrderFilters[ACCEL100HZ_Z_LOWPASS].gx2 = ACCEL100HZ_Z_LOWPASS_GX2;
+    firstOrderFilters[ACCEL100HZ_Z_LOWPASS].gx3 = ACCEL100HZ_Z_LOWPASS_GX3;
+    firstOrderFilters[ACCEL100HZ_Z_LOWPASS].previousInput  = -accelOneG;
     firstOrderFilters[ACCEL100HZ_Z_LOWPASS].previousOutput = -accelOneG;
 
     ///////////////////////////////////
 
     firstOrderFilters[PRESSURE_ALT_LOWPASS].gx1 = PRESSURE_ALT_LOWPASS_GX1;
-	firstOrderFilters[PRESSURE_ALT_LOWPASS].gx2 = PRESSURE_ALT_LOWPASS_GX2;
-	firstOrderFilters[PRESSURE_ALT_LOWPASS].gx3 = PRESSURE_ALT_LOWPASS_GX3;
-	firstOrderFilters[PRESSURE_ALT_LOWPASS].previousInput  = sensors.pressureAlt50Hz;
+    firstOrderFilters[PRESSURE_ALT_LOWPASS].gx2 = PRESSURE_ALT_LOWPASS_GX2;
+    firstOrderFilters[PRESSURE_ALT_LOWPASS].gx3 = PRESSURE_ALT_LOWPASS_GX3;
+    firstOrderFilters[PRESSURE_ALT_LOWPASS].previousInput  = sensors.pressureAlt50Hz;
     firstOrderFilters[PRESSURE_ALT_LOWPASS].previousOutput = sensors.pressureAlt50Hz;
 
     ///////////////////////////////////
 
     firstOrderFilters[EARTH_AXIS_ACCEL_X_HIGHPASS].gx1 = EARTH_AXIS_ACCEL_X_HIGHPASS_GX1;
-	firstOrderFilters[EARTH_AXIS_ACCEL_X_HIGHPASS].gx2 = EARTH_AXIS_ACCEL_X_HIGHPASS_GX2;
-	firstOrderFilters[EARTH_AXIS_ACCEL_X_HIGHPASS].gx3 = EARTH_AXIS_ACCEL_X_HIGHPASS_GX3;
-	firstOrderFilters[EARTH_AXIS_ACCEL_X_HIGHPASS].previousInput  = 0.0f;
+    firstOrderFilters[EARTH_AXIS_ACCEL_X_HIGHPASS].gx2 = EARTH_AXIS_ACCEL_X_HIGHPASS_GX2;
+    firstOrderFilters[EARTH_AXIS_ACCEL_X_HIGHPASS].gx3 = EARTH_AXIS_ACCEL_X_HIGHPASS_GX3;
+    firstOrderFilters[EARTH_AXIS_ACCEL_X_HIGHPASS].previousInput  = 0.0f;
     firstOrderFilters[EARTH_AXIS_ACCEL_X_HIGHPASS].previousOutput = 0.0f;
 
     ///////////////////////////////////
 
     firstOrderFilters[EARTH_AXIS_ACCEL_Y_HIGHPASS].gx1 = EARTH_AXIS_ACCEL_Y_HIGHPASS_GX1;
-	firstOrderFilters[EARTH_AXIS_ACCEL_Y_HIGHPASS].gx2 = EARTH_AXIS_ACCEL_Y_HIGHPASS_GX2;
-	firstOrderFilters[EARTH_AXIS_ACCEL_Y_HIGHPASS].gx3 = EARTH_AXIS_ACCEL_Y_HIGHPASS_GX3;
-	firstOrderFilters[EARTH_AXIS_ACCEL_Y_HIGHPASS].previousInput  = 0.0f;
+    firstOrderFilters[EARTH_AXIS_ACCEL_Y_HIGHPASS].gx2 = EARTH_AXIS_ACCEL_Y_HIGHPASS_GX2;
+    firstOrderFilters[EARTH_AXIS_ACCEL_Y_HIGHPASS].gx3 = EARTH_AXIS_ACCEL_Y_HIGHPASS_GX3;
+    firstOrderFilters[EARTH_AXIS_ACCEL_Y_HIGHPASS].previousInput  = 0.0f;
     firstOrderFilters[EARTH_AXIS_ACCEL_Y_HIGHPASS].previousOutput = 0.0f;
 
     ///////////////////////////////////
 
     firstOrderFilters[EARTH_AXIS_ACCEL_Z_HIGHPASS].gx1 = EARTH_AXIS_ACCEL_Z_HIGHPASS_GX1;
-	firstOrderFilters[EARTH_AXIS_ACCEL_Z_HIGHPASS].gx2 = EARTH_AXIS_ACCEL_Z_HIGHPASS_GX2;
-	firstOrderFilters[EARTH_AXIS_ACCEL_Z_HIGHPASS].gx3 = EARTH_AXIS_ACCEL_Z_HIGHPASS_GX3;
-	firstOrderFilters[EARTH_AXIS_ACCEL_Z_HIGHPASS].previousInput  = 0.0f;
+    firstOrderFilters[EARTH_AXIS_ACCEL_Z_HIGHPASS].gx2 = EARTH_AXIS_ACCEL_Z_HIGHPASS_GX2;
+    firstOrderFilters[EARTH_AXIS_ACCEL_Z_HIGHPASS].gx3 = EARTH_AXIS_ACCEL_Z_HIGHPASS_GX3;
+    firstOrderFilters[EARTH_AXIS_ACCEL_Z_HIGHPASS].previousInput  = 0.0f;
     firstOrderFilters[EARTH_AXIS_ACCEL_Z_HIGHPASS].previousOutput = 0.0f;
 }
 

@@ -53,11 +53,11 @@
 
 typedef struct __attribute__((packed))mtk19Msg_t
 {
-    int32_t	  latitude;
-    int32_t	  longitude;
-    int32_t	  altitude;
-    int32_t	  groundSpeed;
-    int32_t	  groundTrack;
+    int32_t   latitude;
+    int32_t   longitude;
+    int32_t   altitude;
+    int32_t   groundSpeed;
+    int32_t   groundTrack;
     uint8_t   satellites;
     uint8_t   fixType;
     uint32_t  date;
@@ -65,9 +65,11 @@ typedef struct __attribute__((packed))mtk19Msg_t
     uint16_t  hdop;
 } mtk19Msg_t;
 
-union { mtk19Msg_t data;
-        uint8_t    bytes[32];
-      } mtk19Message;
+union
+{
+    mtk19Msg_t data;
+    uint8_t    bytes[32];
+} mtk19Message;
 
 uint8_t mtk19CkA;
 uint8_t mtk19CkB;
@@ -81,8 +83,8 @@ uint8_t mtkRevision;
 
 uint8_t decodeMediaTek3329BinaryMsg(void)
 {
-    uint8_t 	data;
-    uint8_t 	parsed = false;
+    uint8_t     data;
+    uint8_t     parsed = false;
     uint16_t    i;
     uint16_t    numberOfChars;
 
@@ -92,27 +94,27 @@ uint8_t decodeMediaTek3329BinaryMsg(void)
 
     for (i = 0; i < numberOfChars; i++)
     {
-		data = gpsRead();
+        data = gpsRead();
 
-        switch(mtk19ProcessDataState)
+        switch (mtk19ProcessDataState)
         {
-            ///////////////////////////
+                ///////////////////////////
 
             case MTK19_WAIT_SYNC1:
                 if (data == SYNC1_V16)
                 {
-                	mtkRevision = MTK_GPS_REVISION_V16;
-                	mtk19ProcessDataState = MTK19_WAIT_SYNC2;
+                    mtkRevision = MTK_GPS_REVISION_V16;
+                    mtk19ProcessDataState = MTK19_WAIT_SYNC2;
                 }
                 else if (data == SYNC1_V19)
                 {
-					mtkRevision = MTK_GPS_REVISION_V19;
-					mtk19ProcessDataState = MTK19_WAIT_SYNC2;
-				}
+                    mtkRevision = MTK_GPS_REVISION_V19;
+                    mtk19ProcessDataState = MTK19_WAIT_SYNC2;
+                }
 
                 break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case MTK19_WAIT_SYNC2:
                 if (data == SYNC2)
@@ -124,7 +126,7 @@ uint8_t decodeMediaTek3329BinaryMsg(void)
 
                 break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case MTK19_GET_LEN:
                 mtk19ExpectedDataLength = data;
@@ -141,7 +143,7 @@ uint8_t decodeMediaTek3329BinaryMsg(void)
 
                 break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case MTK19_GET_DATA:
                 mtk19CkA += data;
@@ -155,7 +157,7 @@ uint8_t decodeMediaTek3329BinaryMsg(void)
 
                 break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case MTK19_GET_CKA:
                 if (mtk19CkA == data)
@@ -163,55 +165,56 @@ uint8_t decodeMediaTek3329BinaryMsg(void)
                 else
                     mtk19ProcessDataState = MTK19_WAIT_SYNC1;
 
-			    break;
+                break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case MTK19_GET_CKB:
                 if (mtk19CkB == data)
                 {
-				    if (mtkRevision == MTK_GPS_REVISION_V16)
+                    if (mtkRevision == MTK_GPS_REVISION_V16)
                     {
-				    	sensors.gpsLatitude  = (float)mtk19Message.data.latitude  * 0.000001f  * D2R; // Radians
+                        sensors.gpsLatitude  = (float)mtk19Message.data.latitude  * 0.000001f  * D2R; // Radians
                         sensors.gpsLongitude = (float)mtk19Message.data.longitude * 0.000001f  * D2R; // Radians
-			        }
-				    else
-				    {
-				    	sensors.gpsLatitude  = (float)mtk19Message.data.latitude  * 0.0000001f * D2R; // Radians
+                    }
+                    else
+                    {
+                        sensors.gpsLatitude  = (float)mtk19Message.data.latitude  * 0.0000001f * D2R; // Radians
                         sensors.gpsLongitude = (float)mtk19Message.data.longitude * 0.0000001f * D2R; // Radians
-				    }
+                    }
 
-                    sensors.gpsAltitude		 = (float)mtk19Message.data.altitude    * 0.01f;          // Meters
-                    sensors.gpsGroundSpeed	 = (float)mtk19Message.data.groundSpeed * 0.01f;          // Meters/Sec
-                    sensors.gpsGroundTrack	 = (float)mtk19Message.data.groundTrack * 0.01f * D2R;    // Radians
+                    sensors.gpsAltitude      = (float)mtk19Message.data.altitude    * 0.01f;          // Meters
+                    sensors.gpsGroundSpeed   = (float)mtk19Message.data.groundSpeed * 0.01f;          // Meters/Sec
+                    sensors.gpsGroundTrack   = (float)mtk19Message.data.groundTrack * 0.01f * D2R;    // Radians
 
-                    sensors.gpsNumSats		 = mtk19Message.data.satellites;
-                    sensors.gpsFix			 = mtk19Message.data.fixType;
-                    sensors.gpsDate			 = mtk19Message.data.date;
+                    sensors.gpsNumSats       = mtk19Message.data.satellites;
+                    sensors.gpsFix           = mtk19Message.data.fixType;
+                    sensors.gpsDate          = mtk19Message.data.date;
                     sensors.gpsTime          = (float)mtk19Message.data.time * 0.001f;
-                    sensors.gpsHdop			 = (float)mtk19Message.data.hdop * 0.01f;
+                    sensors.gpsHdop          = (float)mtk19Message.data.hdop * 0.01f;
 
                     parsed = true;
-			    }
-			    else
-			    {
-					sensors.gpsLatitude    = GPS_INVALID_ANGLE;
-					sensors.gpsLongitude   = GPS_INVALID_ANGLE;
-					sensors.gpsAltitude	   = GPS_INVALID_ALTITUDE;
-					sensors.gpsGroundSpeed = GPS_INVALID_SPEED;
-					sensors.gpsGroundTrack = GPS_INVALID_ANGLE;
-					sensors.gpsNumSats     = GPS_INVALID_SATS;
-					sensors.gpsFix         = GPS_INVALID_FIX;
-					sensors.gpsDate        = GPS_INVALID_DATE;
-					sensors.gpsTime        = GPS_INVALID_TIME;
-					sensors.gpsHdop        = GPS_INVALID_HDOP;
-				}
+                }
+                else
+                {
+                    sensors.gpsLatitude    = GPS_INVALID_ANGLE;
+                    sensors.gpsLongitude   = GPS_INVALID_ANGLE;
+                    sensors.gpsAltitude    = GPS_INVALID_ALTITUDE;
+                    sensors.gpsGroundSpeed = GPS_INVALID_SPEED;
+                    sensors.gpsGroundTrack = GPS_INVALID_ANGLE;
+                    sensors.gpsNumSats     = GPS_INVALID_SATS;
+                    sensors.gpsFix         = GPS_INVALID_FIX;
+                    sensors.gpsDate        = GPS_INVALID_DATE;
+                    sensors.gpsTime        = GPS_INVALID_TIME;
+                    sensors.gpsHdop        = GPS_INVALID_HDOP;
+                }
 
                 mtk19ProcessDataState = MTK19_WAIT_SYNC1;
 
                 break;
         }
     }
+
     return parsed;
 }
 

@@ -64,6 +64,7 @@ void mpu6000Calibration(void)
     ///////////////////////////////////
 
     cliPrint("\nBegin 1st MPU6000 Measurements...\n");
+
     for (index = 0; index < numberOfSamples; index++)
     {
         readMPU6000();
@@ -76,7 +77,7 @@ void mpu6000Calibration(void)
         gyroBias1[ROLL ]     += rawGyro[ROLL ].value;
         gyroBias1[PITCH]     += rawGyro[PITCH].value;
         gyroBias1[YAW  ]     += rawGyro[YAW  ].value;
-        mpu6000Temperature1  += (float) (rawMPU6000Temperature.value) / 340.0f + 35.0f;
+        mpu6000Temperature1  += (float)(rawMPU6000Temperature.value) / 340.0f + 35.0f;
 
         delayMicroseconds(sampleRate);
     }
@@ -106,6 +107,7 @@ void mpu6000Calibration(void)
     ///////////////////////////////////
 
     cliPrint("\nBegin 2nd MPU6000 Measurements...\n");
+
     for (index = 0; index < numberOfSamples; index++)
     {
         readMPU6000();

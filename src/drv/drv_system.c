@@ -99,8 +99,8 @@ semaphore_t systemReady = false;
 semaphore_t execUp = false;
 
 #ifdef _DTIMING
-	#define LA2_ENABLE       GPIO_SetBits(GPIOC,   GPIO_Pin_2)
-	#define LA2_DISABLE      GPIO_ResetBits(GPIOC, GPIO_Pin_2)
+#define LA0_ENABLE		GPIO_SetBits(GPIOC,   GPIO_Pin_1) // MPX
+#define LA0_DISABLE		GPIO_ResetBits(GPIOC, GPIO_Pin_1) // MPX
 #endif
 
 
@@ -118,18 +118,19 @@ void SysTick_Handler(void)
     sysTickUptime++;
 
     if ((systemReady         == true)  &&
-        (cliBusy             == false) &&
-        (accelCalibrating    == false) &&
-        (escCalibrating      == false) &&
-        (magCalibrating      == false) &&
-        (mpu6000Calibrating  == false))
+            (cliBusy             == false) &&
+            (accelCalibrating    == false) &&
+            (escCalibrating      == false) &&
+            (magCalibrating      == false) &&
+            (mpu6000Calibrating  == false))
 
     {
-        #ifdef _DTIMING
-//    	    LA2_ENABLE;
-        #endif
+#ifdef _DTIMING
+        LA0_ENABLE;
+#endif
 
         frameCounter++;
+
         if (frameCounter > FRAME_COUNT)
             frameCounter = 1;
 
@@ -158,12 +159,12 @@ void SysTick_Handler(void)
         mxrTemp[ZAXIS] = mxr9150Zaxis();
 
         accelSum500HzMXR[XAXIS] += mxrTemp[XAXIS];
-		accelSum500HzMXR[YAXIS] += mxrTemp[YAXIS];
-		accelSum500HzMXR[ZAXIS] += mxrTemp[ZAXIS];
+        accelSum500HzMXR[YAXIS] += mxrTemp[YAXIS];
+        accelSum500HzMXR[ZAXIS] += mxrTemp[ZAXIS];
 
-		accelSum100HzMXR[XAXIS] += mxrTemp[XAXIS];
-		accelSum100HzMXR[YAXIS] += mxrTemp[YAXIS];
-		accelSum100HzMXR[ZAXIS] += mxrTemp[ZAXIS];
+        accelSum100HzMXR[XAXIS] += mxrTemp[XAXIS];
+        accelSum100HzMXR[YAXIS] += mxrTemp[YAXIS];
+        accelSum100HzMXR[ZAXIS] += mxrTemp[ZAXIS];
 
         ///////////////////////////////
 
@@ -173,13 +174,13 @@ void SysTick_Handler(void)
 
             for (index = 0; index < 3; index++)
             {
-            	accelSummedSamples500Hz[index] = accelSum500Hz[index];
-            	accelSum500Hz[index] = 0;
+                accelSummedSamples500Hz[index] = accelSum500Hz[index];
+                accelSum500Hz[index] = 0;
 
-            	accelSummedSamples500HzMXR[index] = accelSum500HzMXR[index];
-            	accelSum500HzMXR[index] = 0.0f;
+                accelSummedSamples500HzMXR[index] = accelSum500HzMXR[index];
+                accelSum500HzMXR[index] = 0.0f;
 
-            	gyroSummedSamples500Hz[index] = gyroSum500Hz[index];
+                gyroSummedSamples500Hz[index] = gyroSum500Hz[index];
                 gyroSum500Hz[index] = 0;
             }
         }
@@ -200,15 +201,15 @@ void SysTick_Handler(void)
             }
 
             if (!newTemperatureReading)
-			{
-				readTemperatureRequestPressure(MS5611_I2C);
-			    newTemperatureReading = true;
-			}
-			else
-			{
-			    readPressureRequestTemperature(MS5611_I2C);
-			    newPressureReading = true;
-			}
+            {
+                readTemperatureRequestPressure(MS5611_I2C);
+                newTemperatureReading = true;
+            }
+            else
+            {
+                readPressureRequestTemperature(MS5611_I2C);
+                newPressureReading = true;
+            }
 
             disk_timerproc();
 
@@ -243,9 +244,9 @@ void SysTick_Handler(void)
 
         ///////////////////////////////
 
-        #ifdef _DTIMING
-//            LA2_DISABLE;
-        #endif
+#ifdef _DTIMING
+        LA0_DISABLE;
+#endif
     }
 }
 
@@ -268,7 +269,7 @@ uint32_t micros(void)
         cycle = *DWT_CYCCNT;
         oldCycle = sysTickCycleCounter;
     }
-    while ( __STREXW( timeMs , &sysTickUptime ) );
+    while (__STREXW(timeMs , &sysTickUptime));
 
     return (timeMs * 1000) + (cycle - oldCycle) / usTicks;
 }
@@ -288,21 +289,21 @@ uint32_t millis(void)
 
 void systemInit(void)
 {
-	// Init cycle counter
+    // Init cycle counter
     cycleCounterInit();
 
     // SysTick
     SysTick_Config(SystemCoreClock / 1000);
 
     checkFirstTime(false);
-	readEEPROM();
+    readEEPROM();
 
-	if (eepromConfig.receiverType == SPEKTRUM)
-		checkSpektrumBind();
+    if (eepromConfig.receiverType == SPEKTRUM)
+        checkSpektrumBind();
 
-	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);  // 2 bits for pre-emption priority, 2 bits for subpriority
+    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);  // 2 bits for pre-emption priority, 2 bits for subpriority
 
-	initMixer();
+    initMixer();
 
     ledInit();
     cliInit();
@@ -350,7 +351,8 @@ void delayMicroseconds(uint32_t us)
     uint32_t elapsed = 0;
     uint32_t lastCount = *DWT_CYCCNT;
 
-    for (;;) {
+    for (;;)
+    {
         register uint32_t current_count = *DWT_CYCCNT;
         uint32_t elapsed_us;
 
@@ -360,6 +362,7 @@ void delayMicroseconds(uint32_t us)
 
         // convert to microseconds
         elapsed_us = elapsed / usTicks;
+
         if (elapsed_us >= us)
             break;
 

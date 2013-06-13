@@ -48,22 +48,27 @@ uint8_t rcActive = false;
 // PWM Receiver Defines and Variables
 ///////////////////////////////////////////////////////////////////////////////
 
-static struct TIM_Channel { TIM_TypeDef *tim;
-                            uint16_t    channel;
-                            uint16_t    cc;
-                          } Channels[] = { { TIM4, TIM_Channel_1, TIM_IT_CC1 },
-                                           { TIM4, TIM_Channel_2, TIM_IT_CC2 },
-                                           { TIM4, TIM_Channel_3, TIM_IT_CC3 },
-                                           { TIM4, TIM_Channel_4, TIM_IT_CC4 },
-                                           { TIM1, TIM_Channel_1, TIM_IT_CC1 },
-                                           { TIM1, TIM_Channel_2, TIM_IT_CC2 },
-                                           { TIM1, TIM_Channel_3, TIM_IT_CC3 },
-                                           { TIM1, TIM_Channel_4, TIM_IT_CC4 }, };
+static struct TIM_Channel
+{
+    TIM_TypeDef *tim;
+    uint16_t    channel;
+    uint16_t    cc;
+} Channels[] = { { TIM4, TIM_Channel_1, TIM_IT_CC1 },
+    { TIM4, TIM_Channel_2, TIM_IT_CC2 },
+    { TIM4, TIM_Channel_3, TIM_IT_CC3 },
+    { TIM4, TIM_Channel_4, TIM_IT_CC4 },
+    { TIM1, TIM_Channel_1, TIM_IT_CC1 },
+    { TIM1, TIM_Channel_2, TIM_IT_CC2 },
+    { TIM1, TIM_Channel_3, TIM_IT_CC3 },
+    { TIM1, TIM_Channel_4, TIM_IT_CC4 },
+};
 
-static struct PWM_State { uint8_t  state;          // 0 = looking for rising edge, 1 = looking for falling edge
-                          uint16_t riseTime;       // Timer value at rising edge of pulse
-                          uint16_t pulseWidth;     // Computed pulse width
-                        } Inputs[8] = { { 0, } };
+static struct PWM_State
+{
+    uint8_t  state;          // 0 = looking for rising edge, 1 = looking for falling edge
+    uint16_t riseTime;       // Timer value at rising edge of pulse
+    uint16_t pulseWidth;     // Computed pulse width
+} Inputs[8] = { { 0, } };
 
 static TIM_ICInitTypeDef  TIM_ICInitStructure;
 
@@ -116,7 +121,8 @@ static void serialPWM_IRQHandler(TIM_TypeDef *tim)
     diff = now - last;
 
     if (diff > 2700 * 2)   // Per http://www.rcgroups.com/forums/showpost.php?p=21996147&postcount=3960
-    {                      // "So, if you use 2.5ms or higher as being the reset for the PPM stream start,
+    {
+        // "So, if you use 2.5ms or higher as being the reset for the PPM stream start,
         chan = 0;          // you will be fine. I use 2.7ms just to be safe."
     }
     else
@@ -125,6 +131,7 @@ static void serialPWM_IRQHandler(TIM_TypeDef *tim)
         {
             Inputs[chan].pulseWidth = diff;
         }
+
         chan++;
     }
 }
@@ -138,13 +145,15 @@ static void parallelPWM_IRQHandler(TIM_TypeDef *tim)
     uint8_t i;
     uint32_t inputCaptureValue = 0;
 
-    for (i = 0; i < 8; i++) {
+    for (i = 0; i < 8; i++)
+    {
         struct TIM_Channel channel = Channels[i];
         struct PWM_State   *state  = &Inputs[i];
 
         if (tim == channel.tim && (TIM_GetITStatus(channel.tim, channel.cc) == SET))
         {
             TIM_ClearITPendingBit(channel.tim, channel.cc);
+
             if (i == 0)
                 rcActive = true;
 
@@ -153,12 +162,15 @@ static void parallelPWM_IRQHandler(TIM_TypeDef *tim)
                 case TIM_Channel_1:
                     inputCaptureValue = (uint16_t)TIM_GetCapture1(channel.tim);
                     break;
+
                 case TIM_Channel_2:
                     inputCaptureValue = (uint16_t)TIM_GetCapture2(channel.tim);
                     break;
+
                 case TIM_Channel_3:
                     inputCaptureValue = (uint16_t)TIM_GetCapture3(channel.tim);
                     break;
+
                 case TIM_Channel_4:
                     inputCaptureValue = (uint16_t)TIM_GetCapture4(channel.tim);
                     break;
@@ -173,9 +185,9 @@ static void parallelPWM_IRQHandler(TIM_TypeDef *tim)
 
                 TIM_ICInitStructure.TIM_Channel     = channel.channel;
                 TIM_ICInitStructure.TIM_ICPolarity  = TIM_ICPolarity_Falling;
-              //TIM_ICInitStructure.TIM_ICSelection = TIM_ICSelection_DirectTI;
-              //TIM_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1;
-              //TIM_ICInitStructure.TIM_ICFilter    = 0x00;
+                //TIM_ICInitStructure.TIM_ICSelection = TIM_ICSelection_DirectTI;
+                //TIM_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1;
+                //TIM_ICInitStructure.TIM_ICFilter    = 0x00;
 
                 TIM_ICInit(channel.tim, &TIM_ICInitStructure);
             }
@@ -194,9 +206,9 @@ static void parallelPWM_IRQHandler(TIM_TypeDef *tim)
 
                 TIM_ICInitStructure.TIM_Channel     = channel.channel;
                 TIM_ICInitStructure.TIM_ICPolarity  = TIM_ICPolarity_Rising;
-              //TIM_ICInitStructure.TIM_ICSelection = TIM_ICSelection_DirectTI;
-              //TIM_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1;
-              //TIM_ICInitStructure.TIM_ICFilter    = 0x00;
+                //TIM_ICInitStructure.TIM_ICSelection = TIM_ICSelection_DirectTI;
+                //TIM_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1;
+                //TIM_ICInitStructure.TIM_ICFilter    = 0x00;
 
                 TIM_ICInit(channel.tim, &TIM_ICInitStructure);
             }
@@ -254,16 +266,17 @@ void USART3_IRQHandler(void)
         }
 
         if (spektrumFrameComplete)
-		{
-		    for (b = 3; b < SPEKTRUM_FRAME_SIZE; b += 2)
-		    {
-		        spektrumChannel = 0x0F & (spektrumFrame[b - 1] >> spektrumChannelShift);
-		        if (spektrumChannel < eepromConfig.spektrumChannels)
-		            spektrumChannelData[spektrumChannel] = ((uint32_t)(spektrumFrame[b - 1] & spektrumChannelMask) << 8) + spektrumFrame[b];
-		    }
+        {
+            for (b = 3; b < SPEKTRUM_FRAME_SIZE; b += 2)
+            {
+                spektrumChannel = 0x0F & (spektrumFrame[b - 1] >> spektrumChannelShift);
 
-		    spektrumFrameComplete = false;
-		}
+                if (spektrumChannel < eepromConfig.spektrumChannels)
+                    spektrumChannelData[spektrumChannel] = ((uint32_t)(spektrumFrame[b - 1] & spektrumChannelMask) << 8) + spektrumFrame[b];
+            }
+
+            spektrumFrameComplete = false;
+        }
     }
 }
 
@@ -287,21 +300,21 @@ void rxInit(void)
     if (eepromConfig.receiverType == SERIAL_PWM)
     {
         // Serial PWM Input
-    	// TIM4_CH4 PD15
+        // TIM4_CH4 PD15
 
         RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
 
-		RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4,  ENABLE);
+        RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4,  ENABLE);
 
-		// preset channels to center
-		for (i = 0; i < 8; i++)
-		    Inputs[i].pulseWidth = RX_PULSE_1p5MS;
+        // preset channels to center
+        for (i = 0; i < 8; i++)
+            Inputs[i].pulseWidth = RX_PULSE_1p5MS;
 
         GPIO_InitStructure.GPIO_Pin   = GPIO_Pin_15;
         GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_AF;
         GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-      //GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-	    GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_DOWN;
+        //GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+        GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_DOWN;
 
         GPIO_Init(GPIOD, &GPIO_InitStructure);
 
@@ -315,18 +328,18 @@ void rxInit(void)
         NVIC_Init(&NVIC_InitStructure);
 
         TIM_TimeBaseStructure.TIM_Prescaler         = 42 - 1;
-	  //TIM_TimeBaseStructure.TIM_CounterMode       = TIM_CounterMode_Up;
-		TIM_TimeBaseStructure.TIM_Period            = 0xFFFF;
-	  //TIM_TimeBaseStructure.TIM_ClockDivision     = TIM_CKD_DIV1;
-	  //TIM_TimeBaseStructure.TIM_RepetitionCounter = 0x0000;
+        //TIM_TimeBaseStructure.TIM_CounterMode       = TIM_CounterMode_Up;
+        TIM_TimeBaseStructure.TIM_Period            = 0xFFFF;
+        //TIM_TimeBaseStructure.TIM_ClockDivision     = TIM_CKD_DIV1;
+        //TIM_TimeBaseStructure.TIM_RepetitionCounter = 0x0000;
 
-		TIM_TimeBaseInit(TIM4, &TIM_TimeBaseStructure);
+        TIM_TimeBaseInit(TIM4, &TIM_TimeBaseStructure);
 
         TIM_ICInitStructure.TIM_Channel     = TIM_Channel_4;
-      //TIM_ICInitStructure.TIM_ICPolarity  = TIM_ICPolarity_Rising;
-      //TIM_ICInitStructure.TIM_ICSelection = TIM_ICSelection_DirectTI;
-      //TIM_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1;
-      //TIM_ICInitStructure.TIM_ICFilter    = 0x00;
+        //TIM_ICInitStructure.TIM_ICPolarity  = TIM_ICPolarity_Rising;
+        //TIM_ICInitStructure.TIM_ICSelection = TIM_ICSelection_DirectTI;
+        //TIM_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1;
+        //TIM_ICInitStructure.TIM_ICFilter    = 0x00;
 
         TIM_ICInit(TIM4, &TIM_ICInitStructure);
 
@@ -339,16 +352,16 @@ void rxInit(void)
     else if (eepromConfig.receiverType == PARALLEL_PWM)
     {
         // Parallel PWM Inputs
-    	// RX1  TIM4_CH1 PD12
-    	// RX2  TIM4_CH2 PD13
-    	// RX3  TIM4_CH3 PD14
-    	// RX4  TIM4_CH4 PD15
-    	// RX5  TIM1_CH1 PE9
-    	// RX6  TIM1_CH2 PE11
-    	// RX7  TIM1_CH3 PE13
-    	// RX8  TIM1_CH4 PE14
+        // RX1  TIM4_CH1 PD12
+        // RX2  TIM4_CH2 PD13
+        // RX3  TIM4_CH3 PD14
+        // RX4  TIM4_CH4 PD15
+        // RX5  TIM1_CH1 PE9
+        // RX6  TIM1_CH2 PE11
+        // RX7  TIM1_CH3 PE13
+        // RX8  TIM1_CH4 PE14
 
-		RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
+        RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
         RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, ENABLE);
 
         RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4,  ENABLE);
@@ -361,19 +374,19 @@ void rxInit(void)
         GPIO_InitStructure.GPIO_Pin   = GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
         GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_AF;
         GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-      //GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-	    GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_DOWN;
+        //GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+        GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_DOWN;
 
-	    GPIO_Init(GPIOD, &GPIO_InitStructure);
+        GPIO_Init(GPIOD, &GPIO_InitStructure);
 
         GPIO_InitStructure.GPIO_Pin   = GPIO_Pin_9 | GPIO_Pin_11 | GPIO_Pin_13 | GPIO_Pin_14;
 
         GPIO_Init(GPIOE, &GPIO_InitStructure);
 
-    	GPIO_PinAFConfig(GPIOD, GPIO_PinSource12, GPIO_AF_TIM4);
-	    GPIO_PinAFConfig(GPIOD, GPIO_PinSource13, GPIO_AF_TIM4);
-	    GPIO_PinAFConfig(GPIOD, GPIO_PinSource14, GPIO_AF_TIM4);
-	    GPIO_PinAFConfig(GPIOD, GPIO_PinSource15, GPIO_AF_TIM4);
+        GPIO_PinAFConfig(GPIOD, GPIO_PinSource12, GPIO_AF_TIM4);
+        GPIO_PinAFConfig(GPIOD, GPIO_PinSource13, GPIO_AF_TIM4);
+        GPIO_PinAFConfig(GPIOD, GPIO_PinSource14, GPIO_AF_TIM4);
+        GPIO_PinAFConfig(GPIOD, GPIO_PinSource15, GPIO_AF_TIM4);
 
         GPIO_PinAFConfig(GPIOE, GPIO_PinSource9,  GPIO_AF_TIM1);
         GPIO_PinAFConfig(GPIOE, GPIO_PinSource11, GPIO_AF_TIM1);
@@ -390,27 +403,27 @@ void rxInit(void)
 
         NVIC_InitStructure.NVIC_IRQChannel                   = TIM1_CC_IRQn;
         //NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 2;
-	    //NVIC_InitStructure.NVIC_IRQChannelSubPriority        = 0;
+        //NVIC_InitStructure.NVIC_IRQChannelSubPriority        = 0;
         //NVIC_InitStructure.NVIC_IRQChannelCmd                = ENABLE;
 
         NVIC_Init(&NVIC_InitStructure);
 
         // TIM4 and TIM1 timebase
         TIM_TimeBaseStructure.TIM_Prescaler         = 42 - 1;
-      //TIM_TimeBaseStructure.TIM_CounterMode       = TIM_CounterMode_Up;
+        //TIM_TimeBaseStructure.TIM_CounterMode       = TIM_CounterMode_Up;
         TIM_TimeBaseStructure.TIM_Period            = 0xFFFF;
-      //TIM_TimeBaseStructure.TIM_ClockDivision     = TIM_CKD_DIV1;
-      //TIM_TimeBaseStructure.TIM_RepetitionCounter = 0x0000;
+        //TIM_TimeBaseStructure.TIM_ClockDivision     = TIM_CKD_DIV1;
+        //TIM_TimeBaseStructure.TIM_RepetitionCounter = 0x0000;
 
         TIM_TimeBaseInit(TIM4, &TIM_TimeBaseStructure);
         TIM_TimeBaseInit(TIM1, &TIM_TimeBaseStructure);
 
         // Parallel PWM Input capture
-      //TIM_ICInitStructure.TIM_Channel     = TIM_Channel_1;
-      //TIM_ICInitStructure.TIM_ICPolarity  = TIM_ICPolarity_Rising;
-      //TIM_ICInitStructure.TIM_ICSelection = TIM_ICSelection_DirectTI;
-      //TIM_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1;
-      //TIM_ICInitStructure.TIM_ICFilter    = 0x00;
+        //TIM_ICInitStructure.TIM_Channel     = TIM_Channel_1;
+        //TIM_ICInitStructure.TIM_ICPolarity  = TIM_ICPolarity_Rising;
+        //TIM_ICInitStructure.TIM_ICSelection = TIM_ICSelection_DirectTI;
+        //TIM_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1;
+        //TIM_ICInitStructure.TIM_ICFilter    = 0x00;
 
         for (i = 0; i < 8; i++)
         {
@@ -423,14 +436,14 @@ void rxInit(void)
 
         TIM_Cmd(TIM4, ENABLE);
         TIM_Cmd(TIM1, ENABLE);
-	}
+    }
 
-	///////////////////////////////////
+    ///////////////////////////////////
 
-	else if (eepromConfig.receiverType == SPEKTRUM)
-	{
+    else if (eepromConfig.receiverType == SPEKTRUM)
+    {
         // Spektrum Satellite RX Input
-    	// USART3 RX P9
+        // USART3 RX P9
 
         RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
 
@@ -445,17 +458,17 @@ void rxInit(void)
         GPIO_InitStructure.GPIO_Pin   = SPEKTRUM_UART_PIN;
         GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_AF;
         GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-      //GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-	    GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_UP;
+        //GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+        GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_UP;
 
         GPIO_Init(SPEKTRUM_UART_GPIO, &GPIO_InitStructure);
 
-    	GPIO_PinAFConfig(SPEKTRUM_UART_GPIO, SPEKTRUM_UART_PINSOURCE, GPIO_AF_USART3);
+        GPIO_PinAFConfig(SPEKTRUM_UART_GPIO, SPEKTRUM_UART_PINSOURCE, GPIO_AF_USART3);
 
         USART_InitStructure.USART_BaudRate            = 115200;
-      //USART_InitStructure.USART_WordLength          = USART_WordLength_8b;
-      //USART_InitStructure.USART_StopBits            = USART_StopBits_1;
-      //USART_InitStructure.USART_Parity              = USART_Parity_No;
+        //USART_InitStructure.USART_WordLength          = USART_WordLength_8b;
+        //USART_InitStructure.USART_StopBits            = USART_StopBits_1;
+        //USART_InitStructure.USART_Parity              = USART_Parity_No;
         USART_InitStructure.USART_Mode                = USART_Mode_Rx;
         USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
 
@@ -468,21 +481,21 @@ void rxInit(void)
 
         if (eepromConfig.spektrumHires)
         {
-		    // 11 bit frames
-		    spektrumChannelShift = 3;
-		    spektrumChannelMask  = 0x07;
-		}
-		else
-		{
-		    // 10 bit frames
-		    spektrumChannelShift = 2;
-		    spektrumChannelMask  = 0x03;
-		}
+            // 11 bit frames
+            spektrumChannelShift = 3;
+            spektrumChannelMask  = 0x07;
+        }
+        else
+        {
+            // 10 bit frames
+            spektrumChannelShift = 2;
+            spektrumChannelMask  = 0x03;
+        }
 
         ///////////////////////////////
-	}
+    }
 
-	///////////////////////////////////
+    ///////////////////////////////////
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -496,16 +509,17 @@ uint16_t rxRead(uint8_t channel)
     if (eepromConfig.receiverType == SPEKTRUM)
     {
         if (channel >= eepromConfig.spektrumChannels)
-    	{
-    	    data = MINCOMMAND;
-    	}
-       	else
-       	{
-       	    if (eepromConfig.spektrumHires)
-       	        data = 1000 + spektrumChannelData[channel];         // 2048 mode
-       	    else
-       	        data = (1000 + spektrumChannelData[channel]) << 1;  // 1024 mode
-       	}
+        {
+            data = MINCOMMAND;
+        }
+        else
+        {
+            if (eepromConfig.spektrumHires)
+                data = 1000 + spektrumChannelData[channel];         // 2048 mode
+            else
+                data = (1000 + spektrumChannelData[channel]) << 1;  // 1024 mode
+        }
+
         return data;
     }
     else
@@ -521,31 +535,31 @@ uint16_t rxRead(uint8_t channel)
 void checkSpektrumBind()
 {
     // Spektrum Satellite RX Input
-  	// USART1 RX PA10
-	// Spektrum Satellite Bind Input
-	// PE14
+    // USART1 RX PA10
+    // Spektrum Satellite Bind Input
+    // PE14
 
-	GPIO_InitTypeDef  GPIO_InitStructure;
+    GPIO_InitTypeDef  GPIO_InitStructure;
 
-	uint8_t i;
+    uint8_t i;
 
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, ENABLE);
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, ENABLE);
 
     ///////////////////////////////
 
     // Configure bind pin as input
     GPIO_InitStructure.GPIO_Pin   = SPEKTRUM_BIND_PIN;
-  //GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_IN;
+    //GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_IN;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-  //GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+    //GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
     GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_UP;
 
     GPIO_Init(SPEKTRUM_BIND_GPIO, &GPIO_InitStructure);
 
     // Check bind pin state, if high (true), return without binding
     if (GPIO_ReadInputDataBit(SPEKTRUM_BIND_GPIO, SPEKTRUM_BIND_PIN) == true)
-    	return;
+        return;
 
     if (eepromConfig.spektrumChannels <= 7)
         spektrumBindCount = 3;  // Master receiver with 7 or less channels
@@ -556,8 +570,8 @@ void checkSpektrumBind()
     GPIO_InitStructure.GPIO_Pin   = SPEKTRUM_UART_PIN;
     GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_OUT;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-  //GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-  //GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_NOPULL;
+    //GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+    //GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_NOPULL;
 
     GPIO_Init(SPEKTRUM_UART_GPIO, &GPIO_InitStructure);
 
@@ -567,11 +581,11 @@ void checkSpektrumBind()
 
     for (i = 0; i < spektrumBindCount; i++)
     {
-	    GPIO_WriteBit(SPEKTRUM_UART_GPIO, SPEKTRUM_UART_PIN, Bit_RESET);
-	    delayMicroseconds(120);
-		GPIO_WriteBit(SPEKTRUM_UART_GPIO, SPEKTRUM_UART_PIN, Bit_SET  );
+        GPIO_WriteBit(SPEKTRUM_UART_GPIO, SPEKTRUM_UART_PIN, Bit_RESET);
         delayMicroseconds(120);
-	}
+        GPIO_WriteBit(SPEKTRUM_UART_GPIO, SPEKTRUM_UART_PIN, Bit_SET);
+        delayMicroseconds(120);
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////

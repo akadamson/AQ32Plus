@@ -49,61 +49,68 @@ void max7456CLI()
 
     cliPrint("\nEntering MAX7456 CLI....\n\n");
 
-   	resetMax7456();
+    resetMax7456();
 
-    while(true)
+    while (true)
     {
-		if (!validQuery) cliPrint("MAX7456 CLI -> ");
+        if (!validQuery) cliPrint("MAX7456 CLI -> ");
 
-		while ((cliAvailable() == false) && (validQuery == false));
+        while ((cliAvailable() == false) && (validQuery == false));
 
-		if (validQuery == false)
-		    max7456query = cliRead();
+        if (validQuery == false)
+            max7456query = cliRead();
 
-		if (!validQuery) cliPrint("\n");
+        if (!validQuery) cliPrint("\n");
 
-		switch(max7456query)
-		{
-            ///////////////////////
+        switch (max7456query)
+        {
+                ///////////////////////
 
             case 'a': // OSD Configuration
                 cliPrint("\nMAX7456 OSD Status:             ");
+
                 if (eepromConfig.osdEnabled)
-                	cliPrint("Enabled\n");
+                    cliPrint("Enabled\n");
                 else
-               	    cliPrint("Disabled\n");
+                    cliPrint("Disabled\n");
 
                 cliPrint("OSD Default Video Standard:     ");
+
                 if (eepromConfig.defaultVideoStandard)
                     cliPrint("PAL\n");
                 else
                     cliPrint("NTSC\n");
 
                 cliPrint("OSD Display Units:              ");
+
                 if (eepromConfig.metricUnits)
                     cliPrint("Metric\n");
                 else
                     cliPrint("English\n");
 
                 cliPrint("OSD Altitude Display:           ");
+
                 if (eepromConfig.osdDisplayAlt)
                     cliPrint("On\n");
                 else
                     cliPrint("Off\n");
 
                 cliPrint("OSD Artifical Horizon Display:  ");
+
                 if (eepromConfig.osdDisplayAH)
                     cliPrint("On\n");
                 else
                     cliPrint("Off\n");
 
                 cliPrint("OSD Attitude Display:           ");
+
                 if (eepromConfig.osdDisplayAtt)
                     cliPrint("On\n");
                 else
                     cliPrint("Off\n");
 
                 cliPrint("OSD Heading Display:            ");
+
                 if (eepromConfig.osdDisplayHdg)
                     cliPrint("On\n");
                 else
@@ -113,7 +120,7 @@ void max7456CLI()
                 validQuery = false;
                 break;
 
-            ///////////////////////
+                ///////////////////////
 
             case 'b': // Enable OSD Altitude Display
                 eepromConfig.osdDisplayAlt  = true;
@@ -122,7 +129,7 @@ void max7456CLI()
                 validQuery = true;
                 break;
 
-            ///////////////////////
+                ///////////////////////
 
             case 'c': // Enable OSD Artifical Horizon Display
                 eepromConfig.osdDisplayAH  = true;
@@ -132,7 +139,7 @@ void max7456CLI()
                 validQuery = true;
                 break;
 
-            ///////////////////////
+                ///////////////////////
 
             case 'd': // Enable OSD Attitude Display
                 eepromConfig.osdDisplayAtt = true;
@@ -142,7 +149,7 @@ void max7456CLI()
                 validQuery = true;
                 break;
 
-            ///////////////////////
+                ///////////////////////
 
             case 'e': // Enable OSD Heading Display
                 eepromConfig.osdDisplayHdg = true;
@@ -151,7 +158,7 @@ void max7456CLI()
                 validQuery = true;
                 break;
 
-            ///////////////////////
+                ///////////////////////
 
             case 'q': // Set English Display Units
                 eepromConfig.metricUnits = false;
@@ -160,62 +167,63 @@ void max7456CLI()
                 validQuery = true;
                 break;
 
-            ///////////////////////
+                ///////////////////////
 
             case 'r': // Reset MAX7456
                 resetMax7456();
                 cliPrint("\nMAX7456 Reset....\n\n");
                 break;
 
-            ///////////////////////
+                ///////////////////////
 
             case 's': // Show character set
                 showMax7456Font();
                 cliPrint("\nMAX7456 Character Set Displayed....\n\n");
                 break;
 
-            ///////////////////////
+                ///////////////////////
 
             case 't': // Download font
                 downloadMax7456Font();
                 break;
 
-            ///////////////////////
+                ///////////////////////
 
             case 'u': // Toggle OSD enabled status
-   			    if (eepromConfig.osdEnabled)                   // If  Enabled
-   			        eepromConfig.osdEnabled = false;           // Set Disabled
-   			    else
-   			    {                                              // If  Disabled
-   			        eepromConfig.osdEnabled = true;            // Set Enabled
+                if (eepromConfig.osdEnabled)                   // If  Enabled
+                    eepromConfig.osdEnabled = false;           // Set Disabled
+                else
+                {
+                    // If  Disabled
+                    eepromConfig.osdEnabled = true;            // Set Enabled
                     initMax7456();                             // and call init procedure
-				}
+                }
 
                 max7456query = 'a';
                 validQuery = true;
-   				break;
+                break;
 
-			///////////////////////
+                ///////////////////////
 
-   		    case 'v': // Toggle default video standard
-   			    if (eepromConfig.defaultVideoStandard)         // If  PAL
-   			        eepromConfig.defaultVideoStandard = NTSC;  // Set NTSC
-   			    else                                           // If  NTSC
-   			        eepromConfig.defaultVideoStandard = PAL;   // Set PAL
+            case 'v': // Toggle default video standard
+                if (eepromConfig.defaultVideoStandard)         // If  PAL
+                    eepromConfig.defaultVideoStandard = NTSC;  // Set NTSC
+                else                                           // If  NTSC
+                    eepromConfig.defaultVideoStandard = PAL;   // Set PAL
 
                 max7456query = 'a';
                 validQuery = true;
-   				break;
+                break;
 
-   		    ///////////////////////
+                ///////////////////////
 
-   			case 'x':
-   			    cliPrint("\nExiting MAX7456 CLI....\n\n");
-   			    cliBusy = false;
-   			    return;
-   			    break;
+            case 'x':
+                cliPrint("\nExiting MAX7456 CLI....\n\n");
+                cliBusy = false;
+                return;
+                break;
 
-            ///////////////////////
+                ///////////////////////
 
             case 'B': // Disable OSD Altitude Display
                 eepromConfig.osdDisplayAlt = false;
@@ -224,7 +232,7 @@ void max7456CLI()
                 validQuery = true;
                 break;
 
-            ///////////////////////
+                ///////////////////////
 
             case 'C': // Disable OSD Artifical Horizon Display
                 eepromConfig.osdDisplayAH = false;
@@ -233,7 +241,7 @@ void max7456CLI()
                 validQuery = true;
                 break;
 
-            ///////////////////////
+                ///////////////////////
 
             case 'D': // Disable OSD Attitude Display
                 eepromConfig.osdDisplayAtt = false;
@@ -242,7 +250,7 @@ void max7456CLI()
                 validQuery = true;
                 break;
 
-            ///////////////////////
+                ///////////////////////
 
             case 'E': // Disable OSD Heading Display
                 eepromConfig.osdDisplayHdg = false;
@@ -251,43 +259,43 @@ void max7456CLI()
                 validQuery = true;
                 break;
 
-           ///////////////////////
+                ///////////////////////
 
-           case 'Q': // Set Metric Display Units
+            case 'Q': // Set Metric Display Units
                 eepromConfig.metricUnits = true;
 
                 max7456query = 'a';
                 validQuery = true;
                 break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case 'W': // Write EEPROM Parameters
                 cliPrint("\nWriting EEPROM Parameters....\n\n");
                 writeEEPROM();
                 break;
 
-    		///////////////////////
+                ///////////////////////
 
-			case '?':
-			   	cliPrint("\n");
-			   	cliPrint("'a' OSD Configuration\n");
-			    cliPrint("'b' Enable OSD Altitude Display            'B' Disable OSD Altitude Display\n");
-			   	cliPrint("'c' Enable OSD Artificial Horizon Display  'C' Disable OSD Artificial Horizon Display\n");
-			   	cliPrint("'d' Enable OSD Attitude Display            'D' Disable OSD Attitude Display\n");
-			   	cliPrint("'e' Enable OSD Heading Display             'E' Disable OSD Heading Display\n");
-			   	cliPrint("'q' Set English Display Units              'Q' Set Metric Display Units\n");
-			    cliPrint("'r' Reset MAX7456\n");
-			   	cliPrint("'s' Display MAX7456 Character Set\n");
-			   	cliPrint("'t' Download Font to MAX7456\n");
-			   	cliPrint("'u' Toggle OSD Enabled State\n");
-			   	cliPrint("'v' Toggle Default Video Standard          'W' Write EEPROM Parameters\n");
-			   	cliPrint("'x' Exit Sensor CLI                        '?' Command Summary\n");
-			   	cliPrint("\n");
-	    	    break;
+            case '?':
+                cliPrint("\n");
+                cliPrint("'a' OSD Configuration\n");
+                cliPrint("'b' Enable OSD Altitude Display            'B' Disable OSD Altitude Display\n");
+                cliPrint("'c' Enable OSD Artificial Horizon Display  'C' Disable OSD Artificial Horizon Display\n");
+                cliPrint("'d' Enable OSD Attitude Display            'D' Disable OSD Attitude Display\n");
+                cliPrint("'e' Enable OSD Heading Display             'E' Disable OSD Heading Display\n");
+                cliPrint("'q' Set English Display Units              'Q' Set Metric Display Units\n");
+                cliPrint("'r' Reset MAX7456\n");
+                cliPrint("'s' Display MAX7456 Character Set\n");
+                cliPrint("'t' Download Font to MAX7456\n");
+                cliPrint("'u' Toggle OSD Enabled State\n");
+                cliPrint("'v' Toggle Default Video Standard          'W' Write EEPROM Parameters\n");
+                cliPrint("'x' Exit Sensor CLI                        '?' Command Summary\n");
+                cliPrint("\n");
+                break;
 
-	    	///////////////////////
-	    }
+                ///////////////////////
+        }
     }
 }
 
@@ -309,48 +317,49 @@ void mixerCLI()
 
     cliPrint("\nEntering Mixer CLI....\n\n");
 
-    while(true)
+    while (true)
     {
         cliPrint("Mixer CLI -> ");
 
-		while ((cliAvailable() == false) && (validQuery == false));
+        while ((cliAvailable() == false) && (validQuery == false));
 
-		if (validQuery == false)
-		    mixerQuery = cliRead();
+        if (validQuery == false)
+            mixerQuery = cliRead();
 
-		cliPrint("\n");
+        cliPrint("\n");
 
-		switch(mixerQuery)
-		{
-            ///////////////////////////
+        switch (mixerQuery)
+        {
+                ///////////////////////////
 
             case 'a': // Mixer Configuration
                 cliPrint("\nMixer Configuration:            ");
+
                 switch (eepromConfig.mixerConfiguration)
                 {
                     case MIXERTYPE_GIMBAL:
-                    	cliPrint("MIXERTYPE GIMBAL\n");
-                    	break;
+                        cliPrint("MIXERTYPE GIMBAL\n");
+                        break;
 
-                    ///////////////////////
+                        ///////////////////////
 
                     case MIXERTYPE_FLYING_WING:
-                    	cliPrint("MIXERTYPE FLYING WING\n");
-                    	break;
+                        cliPrint("MIXERTYPE FLYING WING\n");
+                        break;
 
-                    ///////////////////////
+                        ///////////////////////
 
                     case MIXERTYPE_BI:
                         cliPrint("MIXERTYPE BICOPTER\n");
                         break;
 
-                    ///////////////////////
+                        ///////////////////////
 
                     case MIXERTYPE_TRI:
                         cliPrint("MIXERTYPE TRICOPTER\n");
                         break;
 
-                    ///////////////////////
+                        ///////////////////////
 
                     case MIXERTYPE_QUADP:
                         cliPrint("MIXERTYPE QUAD PLUS\n");
@@ -361,34 +370,34 @@ void mixerCLI()
                         break;
 
                     case MIXERTYPE_VTAIL4_NO_COMP:
-                    	cliPrint("MULTITYPE VTAIL NO COMP\n");
-                    	break;
+                        cliPrint("MULTITYPE VTAIL NO COMP\n");
+                        break;
 
                     case MIXERTYPE_VTAIL4_Y_COMP:
-                    	cliPrint("MULTITYPE VTAIL Y COMP\n");
-                    	break;
+                        cliPrint("MULTITYPE VTAIL Y COMP\n");
+                        break;
 
                     case MIXERTYPE_VTAIL4_RY_COMP:
-                    	cliPrint("MULTITYPE VTAIL RY COMP\n");
-                    	break;
+                        cliPrint("MULTITYPE VTAIL RY COMP\n");
+                        break;
 
                     case MIXERTYPE_VTAIL4_PY_COMP:
-                    	cliPrint("MULTITYPE VTAIL PY COMP\n");
-                    	break;
+                        cliPrint("MULTITYPE VTAIL PY COMP\n");
+                        break;
 
                     case MIXERTYPE_VTAIL4_RP_COMP:
-                    	cliPrint("MULTITYPE VTAIL RP COMP\n");
-                    	break;
+                        cliPrint("MULTITYPE VTAIL RP COMP\n");
+                        break;
 
                     case MIXERTYPE_VTAIL4_RPY_COMP:
-                    	cliPrint("MULTITYPE VTAIL RPY COMP\n");
-                    	break;
+                        cliPrint("MULTITYPE VTAIL RPY COMP\n");
+                        break;
 
                     case MIXERTYPE_Y4:
-                    	cliPrint("MIXERTYPE Y4\n");
-                    	break;
+                        cliPrint("MIXERTYPE Y4\n");
+                        break;
 
-                    ///////////////////////
+                        ///////////////////////
 
                     case MIXERTYPE_HEX6P:
                         cliPrint("MIXERTYPE HEX PLUS\n");
@@ -402,7 +411,7 @@ void mixerCLI()
                         cliPrint("MIXERTYPE Y6\n");
                         break;
 
-                    ///////////////////////
+                        ///////////////////////
 
                     case MIXERTYPE_OCTOF8P:
                         cliPrint("MIXERTYPE FLAT OCTO PLUS\n");
@@ -420,18 +429,18 @@ void mixerCLI()
                         cliPrint("MIXERTYPE COAXIAL OCTO X\n");
                         break;
 
-                    ///////////////////////
+                        ///////////////////////
 
                     case MIXERTYPE_FREEMIX:
-                    	cliPrint("MIXERTYPE FREE MIX\n");
-                    	break;
+                        cliPrint("MIXERTYPE FREE MIX\n");
+                        break;
                 }
 
                 cliPrintF("Number of Motors:                  %1d\n",  numberMotor);
                 cliPrintF("ESC PWM Rate:                    %3ld\n", eepromConfig.escPwmRate);
                 cliPrintF("Servo PWM Rate:                  %3ld\n", eepromConfig.servoPwmRate);
 
-                if ( eepromConfig.mixerConfiguration == MIXERTYPE_BI )
+                if (eepromConfig.mixerConfiguration == MIXERTYPE_BI)
                 {
                     cliPrintF("BiCopter Left Servo Min:        %4ld\n", (uint16_t)eepromConfig.biLeftServoMin);
                     cliPrintF("BiCopter Left Servo Mid:        %4ld\n", (uint16_t)eepromConfig.biLeftServoMid);
@@ -441,7 +450,7 @@ void mixerCLI()
                     cliPrintF("BiCopter Right Servo Max:       %4ld\n", (uint16_t)eepromConfig.biRightServoMax);
                 }
 
-                if ( eepromConfig.mixerConfiguration == MIXERTYPE_FLYING_WING )
+                if (eepromConfig.mixerConfiguration == MIXERTYPE_FLYING_WING)
                 {
                     cliPrintF("Roll Direction Left:            %4ld\n", (uint16_t)eepromConfig.rollDirectionLeft);
                     cliPrintF("Roll Direction Right:           %4ld\n", (uint16_t)eepromConfig.rollDirectionRight);
@@ -453,19 +462,19 @@ void mixerCLI()
                     cliPrintF("Wing Right Maximum:             %4ld\n", (uint16_t)eepromConfig.wingRightMaximum);
                 }
 
-                if ( eepromConfig.mixerConfiguration == MIXERTYPE_GIMBAL )
+                if (eepromConfig.mixerConfiguration == MIXERTYPE_GIMBAL)
                 {
-                    cliPrintF("Gimbal Roll Servo Min:          %4ld\n",   (uint16_t)eepromConfig.gimbalRollServoMin);
-                    cliPrintF("Gimbal Roll Servo Mid:          %4ld\n",   (uint16_t)eepromConfig.gimbalRollServoMid);
-                    cliPrintF("Gimbal Roll Servo Max:          %4ld\n",   (uint16_t)eepromConfig.gimbalRollServoMax);
+                    cliPrintF("Gimbal Roll Servo Min:          %4ld\n", (uint16_t)eepromConfig.gimbalRollServoMin);
+                    cliPrintF("Gimbal Roll Servo Mid:          %4ld\n", (uint16_t)eepromConfig.gimbalRollServoMid);
+                    cliPrintF("Gimbal Roll Servo Max:          %4ld\n", (uint16_t)eepromConfig.gimbalRollServoMax);
                     cliPrintF("Gimbal Roll Servo Gain:          %7.3f\n", eepromConfig.gimbalRollServoGain);
-                    cliPrintF("Gimbal Pitch Servo Min:         %4ld\n",   (uint16_t)eepromConfig.gimbalPitchServoMin);
-                    cliPrintF("Gimbal Pitch Servo Mid:         %4ld\n",   (uint16_t)eepromConfig.gimbalPitchServoMid);
-                    cliPrintF("Gimbal Pitch Servo Max:         %4ld\n",   (uint16_t)eepromConfig.gimbalPitchServoMax);
+                    cliPrintF("Gimbal Pitch Servo Min:         %4ld\n", (uint16_t)eepromConfig.gimbalPitchServoMin);
+                    cliPrintF("Gimbal Pitch Servo Mid:         %4ld\n", (uint16_t)eepromConfig.gimbalPitchServoMid);
+                    cliPrintF("Gimbal Pitch Servo Max:         %4ld\n", (uint16_t)eepromConfig.gimbalPitchServoMax);
                     cliPrintF("Gimbal Pitch Servo Gain:         %7.3f\n", eepromConfig.gimbalPitchServoGain);
-                 }
+                }
 
-                if ( eepromConfig.mixerConfiguration == MIXERTYPE_TRI )
+                if (eepromConfig.mixerConfiguration == MIXERTYPE_TRI)
                 {
                     cliPrintF("TriCopter Yaw Servo Min:        %4ld\n", (uint16_t)eepromConfig.triYawServoMin);
                     cliPrintF("TriCopter Yaw Servo Mid:        %4ld\n", (uint16_t)eepromConfig.triYawServoMid);
@@ -473,55 +482,55 @@ void mixerCLI()
                 }
 
                 if (eepromConfig.mixerConfiguration == MIXERTYPE_VTAIL4_Y_COMP  ||
-                    eepromConfig.mixerConfiguration == MIXERTYPE_VTAIL4_RY_COMP ||
-                    eepromConfig.mixerConfiguration == MIXERTYPE_VTAIL4_PY_COMP ||
-                    eepromConfig.mixerConfiguration == MIXERTYPE_VTAIL4_RP_COMP ||
-                    eepromConfig.mixerConfiguration == MIXERTYPE_VTAIL4_RPY_COMP)
+                        eepromConfig.mixerConfiguration == MIXERTYPE_VTAIL4_RY_COMP ||
+                        eepromConfig.mixerConfiguration == MIXERTYPE_VTAIL4_PY_COMP ||
+                        eepromConfig.mixerConfiguration == MIXERTYPE_VTAIL4_RP_COMP ||
+                        eepromConfig.mixerConfiguration == MIXERTYPE_VTAIL4_RPY_COMP)
                 {
                     cliPrintF("V Tail Angle                     %6.2f\n", eepromConfig.vTailAngle);
-                 }
+                }
 
                 cliPrintF("Yaw Direction:                    %2d\n\n", (uint16_t)eepromConfig.yawDirection);
 
                 validQuery = false;
                 break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case 'b': // Free Mix Matrix
-        	    cliPrintF("\nNumber of Free Mixer Motors:  %1d\n         Roll    Pitch   Yaw\n", eepromConfig.freeMixMotors);
+                cliPrintF("\nNumber of Free Mixer Motors:  %1d\n         Roll    Pitch   Yaw\n", eepromConfig.freeMixMotors);
 
-        	    for ( index = 0; index < eepromConfig.freeMixMotors; index++ )
-        	    {
-        	    	cliPrintF("Motor%1d  %6.3f  %6.3f  %6.3f\n", index,
-        	    			                                     eepromConfig.freeMix[index][ROLL ],
-        	    			                                     eepromConfig.freeMix[index][PITCH],
-        	    			                                     eepromConfig.freeMix[index][YAW  ]);
-        	    }
+                for (index = 0; index < eepromConfig.freeMixMotors; index++)
+                {
+                    cliPrintF("Motor%1d  %6.3f  %6.3f  %6.3f\n", index,
+                              eepromConfig.freeMix[index][ROLL ],
+                              eepromConfig.freeMix[index][PITCH],
+                              eepromConfig.freeMix[index][YAW  ]);
+                }
 
-        	    cliPrint("\n");
-        	    validQuery = false;
-        	    break;
+                cliPrint("\n");
+                validQuery = false;
+                break;
 
-            ///////////////////////////
+                ///////////////////////////
 
-			case 'x':
-			    cliPrint("\nExiting Mixer CLI....\n\n");
-			    cliBusy = false;
-			    return;
-			    break;
+            case 'x':
+                cliPrint("\nExiting Mixer CLI....\n\n");
+                cliBusy = false;
+                return;
+                break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case 'A': // Read Mixer Configuration
                 eepromConfig.mixerConfiguration = (uint8_t)readFloatCLI();
                 initMixer();
 
-        	    mixerQuery = 'a';
+                mixerQuery = 'a';
                 validQuery = true;
-		        break;
+                break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case 'B': // Read ESC and Servo PWM Update Rates
                 eepromConfig.escPwmRate   = (uint16_t)readFloatCLI();
@@ -532,31 +541,31 @@ void mixerCLI()
 
                 mixerQuery = 'a';
                 validQuery = true;
-        	    break;
+                break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case 'C': // Read BiCopter Left Servo Parameters
-           	    eepromConfig.biLeftServoMin = readFloatCLI();
-           	    eepromConfig.biLeftServoMid = readFloatCLI();
-           	    eepromConfig.biLeftServoMax = readFloatCLI();
+                eepromConfig.biLeftServoMin = readFloatCLI();
+                eepromConfig.biLeftServoMid = readFloatCLI();
+                eepromConfig.biLeftServoMax = readFloatCLI();
 
-           	    mixerQuery = 'a';
+                mixerQuery = 'a';
                 validQuery = true;
                 break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case 'D': // Read BiCopter Right Servo Parameters
-           	    eepromConfig.biRightServoMin = readFloatCLI();
-           	    eepromConfig.biRightServoMid = readFloatCLI();
-           	    eepromConfig.biRightServoMax = readFloatCLI();
+                eepromConfig.biRightServoMin = readFloatCLI();
+                eepromConfig.biRightServoMid = readFloatCLI();
+                eepromConfig.biRightServoMax = readFloatCLI();
 
-           	    mixerQuery = 'a';
+                mixerQuery = 'a';
                 validQuery = true;
                 break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case 'E': // Read Flying Wing Servo Directions
                 eepromConfig.rollDirectionLeft   = readFloatCLI();
@@ -564,33 +573,33 @@ void mixerCLI()
                 eepromConfig.pitchDirectionLeft  = readFloatCLI();
                 eepromConfig.pitchDirectionRight = readFloatCLI();
 
-         	    mixerQuery = 'a';
+                mixerQuery = 'a';
                 validQuery = true;
                 break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case 'F': // Read Flying Wing Servo Limits
-           	    eepromConfig.wingLeftMinimum  = readFloatCLI();
-           	    eepromConfig.wingLeftMaximum  = readFloatCLI();
-           	    eepromConfig.wingRightMinimum = readFloatCLI();
-           	    eepromConfig.wingRightMaximum = readFloatCLI();
+                eepromConfig.wingLeftMinimum  = readFloatCLI();
+                eepromConfig.wingLeftMaximum  = readFloatCLI();
+                eepromConfig.wingRightMinimum = readFloatCLI();
+                eepromConfig.wingRightMaximum = readFloatCLI();
 
                 mixerQuery = 'a';
                 validQuery = true;
                 break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case 'G': // Read Free Mix Motor Number
-           	    eepromConfig.freeMixMotors = (uint8_t)readFloatCLI();
-           	    initMixer();
+                eepromConfig.freeMixMotors = (uint8_t)readFloatCLI();
+                initMixer();
 
-           	    mixerQuery = 'b';
+                mixerQuery = 'b';
                 validQuery = true;
                 break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case 'H': // Read Free Mix Matrix Element
                 rows    = (uint8_t)readFloatCLI();
@@ -601,58 +610,59 @@ void mixerCLI()
                 validQuery = true;
                 break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case 'I': // Read Gimbal Roll Servo Parameters
-         	    eepromConfig.gimbalRollServoMin  = readFloatCLI();
-           	    eepromConfig.gimbalRollServoMid  = readFloatCLI();
-           	    eepromConfig.gimbalRollServoMax  = readFloatCLI();
-           	    eepromConfig.gimbalRollServoGain = readFloatCLI();
+                eepromConfig.gimbalRollServoMin  = readFloatCLI();
+                eepromConfig.gimbalRollServoMid  = readFloatCLI();
+                eepromConfig.gimbalRollServoMax  = readFloatCLI();
+                eepromConfig.gimbalRollServoGain = readFloatCLI();
 
-           	    mixerQuery = 'a';
+                mixerQuery = 'a';
                 validQuery = true;
                 break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case 'J': // Read Gimbal Pitch Servo Parameters
-           	    eepromConfig.gimbalPitchServoMin  = readFloatCLI();
-           	    eepromConfig.gimbalPitchServoMid  = readFloatCLI();
-           	    eepromConfig.gimbalPitchServoMax  = readFloatCLI();
-           	    eepromConfig.gimbalPitchServoGain = readFloatCLI();
+                eepromConfig.gimbalPitchServoMin  = readFloatCLI();
+                eepromConfig.gimbalPitchServoMid  = readFloatCLI();
+                eepromConfig.gimbalPitchServoMax  = readFloatCLI();
+                eepromConfig.gimbalPitchServoGain = readFloatCLI();
 
-           	    mixerQuery = 'a';
+                mixerQuery = 'a';
                 validQuery = true;
                 break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case 'K': // Read TriCopter YawServo Parameters
-        	    eepromConfig.triYawServoMin = readFloatCLI();
-           	    eepromConfig.triYawServoMid = readFloatCLI();
-           	    eepromConfig.triYawServoMax = readFloatCLI();
+                eepromConfig.triYawServoMin = readFloatCLI();
+                eepromConfig.triYawServoMid = readFloatCLI();
+                eepromConfig.triYawServoMax = readFloatCLI();
 
-           	    mixerQuery = 'a';
+                mixerQuery = 'a';
                 validQuery = true;
                 break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case 'L': // Read V Tail Angle
-        	    eepromConfig.vTailAngle = readFloatCLI();
+                eepromConfig.vTailAngle = readFloatCLI();
 
-        	    mixerQuery = 'a';
+                mixerQuery = 'a';
                 validQuery = true;
                 break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case 'M': // Read yaw direction
                 tempFloat = readFloatCLI();
+
                 if (tempFloat >= 0.0)
                     tempFloat = 1.0;
                 else
-                	tempFloat = -1.0;
+                    tempFloat = -1.0;
 
                 eepromConfig.yawDirection = tempFloat;
 
@@ -660,38 +670,38 @@ void mixerCLI()
                 validQuery = true;
                 break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case 'W': // Write EEPROM Parameters
                 cliPrint("\nWriting EEPROM Parameters....\n\n");
                 writeEEPROM();
                 break;
 
-			///////////////////////////
+                ///////////////////////////
 
-			case '?':
-			   	cliPrint("\n");
-			   	cliPrint("'a' Mixer Configuration Data               'A' Set Mixer Configuration              A1 thru 21, see aq32Plus.h\n");
-   		        cliPrint("'b' Free Mixer Configuration               'B' Set PWM Rates                        BESC;Servo\n");
-			   	cliPrint("                                           'C' Set BiCopter Left Servo Parameters   CMin;Mid;Max\n");
-			   	cliPrint("                                           'D' Set BiCopter Right Servo Parameters  DMin;Mid;Max\n");
-			   	cliPrint("                                           'E' Set Flying Wing Servo Directions     ERollLeft;RollRight;PitchLeft;PitchRight\n");
-			   	cliPrint("                                           'F' Set Flying Wing Servo Limits         FLeftMin;LeftMax;RightMin;RightMax\n");
-   		        cliPrint("                                           'G' Set Number of FreeMix Motors         GNumber\n");
-   		        cliPrint("                                           'H' Set FreeMix Matrix Element           HRow;Column;Element\n");
-   		        cliPrint("                                           'I' Set Gimbal Roll Servo Parameters     IMin;Mid;Max;Gain\n");
-   		        cliPrint("                                           'J' Set Gimbal Pitch Servo Parameters    JMin;Mid;Max;Gain\n");
-   		        cliPrint("                                           'K' Set TriCopter Servo Parameters       KMin;Mid;Max\n");
-   		        cliPrint("                                           'L' Set V Tail Angle                     LAngle\n");
-   		        cliPrint("                                           'M' Set Yaw Direction                    M1 or M-1\n");
-   		        cliPrint("                                           'W' Write EEPROM Parameters\n");
-   		        cliPrint("'x' Exit Sensor CLI                        '?' Command Summary\n");
-   		        cliPrint("\n");
-	    	    break;
+            case '?':
+                cliPrint("\n");
+                cliPrint("'a' Mixer Configuration Data               'A' Set Mixer Configuration              A1 thru 21, see aq32Plus.h\n");
+                cliPrint("'b' Free Mixer Configuration               'B' Set PWM Rates                        BESC;Servo\n");
+                cliPrint("                                           'C' Set BiCopter Left Servo Parameters   CMin;Mid;Max\n");
+                cliPrint("                                           'D' Set BiCopter Right Servo Parameters  DMin;Mid;Max\n");
+                cliPrint("                                           'E' Set Flying Wing Servo Directions     ERollLeft;RollRight;PitchLeft;PitchRight\n");
+                cliPrint("                                           'F' Set Flying Wing Servo Limits         FLeftMin;LeftMax;RightMin;RightMax\n");
+                cliPrint("                                           'G' Set Number of FreeMix Motors         GNumber\n");
+                cliPrint("                                           'H' Set FreeMix Matrix Element           HRow;Column;Element\n");
+                cliPrint("                                           'I' Set Gimbal Roll Servo Parameters     IMin;Mid;Max;Gain\n");
+                cliPrint("                                           'J' Set Gimbal Pitch Servo Parameters    JMin;Mid;Max;Gain\n");
+                cliPrint("                                           'K' Set TriCopter Servo Parameters       KMin;Mid;Max\n");
+                cliPrint("                                           'L' Set V Tail Angle                     LAngle\n");
+                cliPrint("                                           'M' Set Yaw Direction                    M1 or M-1\n");
+                cliPrint("                                           'W' Write EEPROM Parameters\n");
+                cliPrint("'x' Exit Sensor CLI                        '?' Command Summary\n");
+                cliPrint("\n");
+                break;
 
-	    	///////////////////////////
-	    }
-	}
+                ///////////////////////////
+        }
+    }
 
 }
 
@@ -711,65 +721,70 @@ void receiverCLI()
 
     cliPrint("\nEntering Receiver CLI....\n\n");
 
-    while(true)
+    while (true)
     {
         cliPrint("Receiver CLI -> ");
 
-		while ((cliAvailable() == false) && (validQuery == false));
+        while ((cliAvailable() == false) && (validQuery == false));
 
-		if (validQuery == false)
-		    receiverQuery = cliRead();
+        if (validQuery == false)
+            receiverQuery = cliRead();
 
-		cliPrint("\n");
+        cliPrint("\n");
 
-		switch(receiverQuery)
-		{
-            ///////////////////////////
+        switch (receiverQuery)
+        {
+                ///////////////////////////
 
             case 'a': // Receiver Configuration
                 cliPrint("\nReceiver Type:                  ");
-                switch(eepromConfig.receiverType)
+
+                switch (eepromConfig.receiverType)
                 {
                     case PARALLEL_PWM:
                         cliPrint("Parallel\n");
                         break;
+
                     case SERIAL_PWM:
                         cliPrint("Serial\n");
                         break;
+
                     case SPEKTRUM:
                         cliPrint("Spektrum\n");
                         break;
-		        }
+                }
 
                 cliPrint("Current RC Channel Assignment:  ");
+
                 for (index = 0; index < 8; index++)
                     rcOrderString[eepromConfig.rcMap[index]] = rcChannelLetters[index];
 
                 rcOrderString[index] = '\0';
 
-                cliPrint(rcOrderString);  cliPrint("\n");
+                cliPrint(rcOrderString);
+                cliPrint("\n");
 
                 cliPrintF("Spektrum Resolution:            %s\n",     eepromConfig.spektrumHires ? "11 Bit Mode" : "10 Bit Mode");
                 cliPrintF("Number of Spektrum Channels:    %2d\n",    eepromConfig.spektrumChannels);
-                cliPrintF("Mid Command:                    %4ld\n",   (uint16_t)eepromConfig.midCommand);
-				cliPrintF("Min Check:                      %4ld\n",   (uint16_t)eepromConfig.minCheck);
-				cliPrintF("Max Check:                      %4ld\n",   (uint16_t)eepromConfig.maxCheck);
-				cliPrintF("Min Throttle:                   %4ld\n",   (uint16_t)eepromConfig.minThrottle);
-				cliPrintF("Max Thottle:                    %4ld\n\n", (uint16_t)eepromConfig.maxThrottle);
+                cliPrintF("Mid Command:                    %4ld\n", (uint16_t)eepromConfig.midCommand);
+                cliPrintF("Min Check:                      %4ld\n", (uint16_t)eepromConfig.minCheck);
+                cliPrintF("Max Check:                      %4ld\n", (uint16_t)eepromConfig.maxCheck);
+                cliPrintF("Min Throttle:                   %4ld\n", (uint16_t)eepromConfig.minThrottle);
+                cliPrintF("Max Thottle:                    %4ld\n\n", (uint16_t)eepromConfig.maxThrottle);
 
-				tempFloat = eepromConfig.rateScaling * 180000.0 / PI;
-				cliPrintF("Max Rate Command:               %6.2f DPS\n", tempFloat);
+                tempFloat = eepromConfig.rateScaling * 180000.0 / PI;
+                cliPrintF("Max Rate Command:               %6.2f DPS\n", tempFloat);
 
-				tempFloat = eepromConfig.attitudeScaling * 180000.0 / PI;
+                tempFloat = eepromConfig.attitudeScaling * 180000.0 / PI;
                 cliPrintF("Max Attitude Command:           %6.2f Degrees\n\n", tempFloat);
 
-				cliPrintF("Arm Delay Count:                %3d Frames\n",   eepromConfig.armCount);
-				cliPrintF("Disarm Delay Count:             %3d Frames\n\n", eepromConfig.disarmCount);
+                cliPrintF("Arm Delay Count:                %3d Frames\n",   eepromConfig.armCount);
+                cliPrintF("Disarm Delay Count:             %3d Frames\n\n", eepromConfig.disarmCount);
 
-				validQuery = false;
-				break;
+                validQuery = false;
+                break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case 'b': // Read Max Rate Value
                 eepromConfig.rateScaling = readFloatCLI() / 180000 * PI;
@@ -778,7 +793,7 @@ void receiverCLI()
                 validQuery = true;
                 break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case 'c': // Read Max Attitude Value
                 eepromConfig.attitudeScaling = readFloatCLI() / 180000 * PI;
@@ -787,38 +802,38 @@ void receiverCLI()
                 validQuery = true;
                 break;
 
-            ///////////////////////////
+                ///////////////////////////
 
-			case 'x':
-			    cliPrint("\nExiting Receiver CLI....\n\n");
-			    cliBusy = false;
-			    return;
-			    break;
+            case 'x':
+                cliPrint("\nExiting Receiver CLI....\n\n");
+                cliBusy = false;
+                return;
+                break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case 'A': // Read RX Input Type
                 eepromConfig.receiverType = (uint8_t)readFloatCLI();
-			    cliPrint( "\nReceiver Type Changed....\n");
+                cliPrint("\nReceiver Type Changed....\n");
 
-			    cliPrint("\nSystem Resetting....\n");
-			    delay(100);
-			    writeEEPROM();
-			    systemReset(false);
+                cliPrint("\nSystem Resetting....\n");
+                delay(100);
+                writeEEPROM();
+                systemReset(false);
 
-		        break;
+                break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case 'B': // Read RC Control Order
-                readStringCLI( rcOrderString, 8 );
-                parseRcChannels( rcOrderString );
+                readStringCLI(rcOrderString, 8);
+                parseRcChannels(rcOrderString);
 
-          	    receiverQuery = 'a';
+                receiverQuery = 'a';
                 validQuery = true;
-        	    break;
+                break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case 'C': // Read Spektrum Resolution
                 eepromConfig.spektrumHires = (uint8_t)readFloatCLI();
@@ -827,7 +842,7 @@ void receiverCLI()
                 validQuery = true;
                 break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case 'D': // Read Number of Spektrum Channels
                 eepromConfig.spektrumChannels = (uint8_t)readFloatCLI();
@@ -836,54 +851,54 @@ void receiverCLI()
                 validQuery = true;
                 break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case 'E': // Read RC Control Points
                 eepromConfig.midCommand   = readFloatCLI();
-    	        eepromConfig.minCheck     = readFloatCLI();
-    		    eepromConfig.maxCheck     = readFloatCLI();
-    		    eepromConfig.minThrottle  = readFloatCLI();
-    		    eepromConfig.maxThrottle  = readFloatCLI();
+                eepromConfig.minCheck     = readFloatCLI();
+                eepromConfig.maxCheck     = readFloatCLI();
+                eepromConfig.minThrottle  = readFloatCLI();
+                eepromConfig.maxThrottle  = readFloatCLI();
 
                 receiverQuery = 'a';
                 validQuery = true;
                 break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case 'F': // Read Arm/Disarm Counts
                 eepromConfig.armCount    = (uint8_t)readFloatCLI();
-    	        eepromConfig.disarmCount = (uint8_t)readFloatCLI();
+                eepromConfig.disarmCount = (uint8_t)readFloatCLI();
 
                 receiverQuery = 'a';
                 validQuery = true;
                 break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case 'W': // Write EEPROM Parameters
                 cliPrint("\nWriting EEPROM Parameters....\n\n");
                 writeEEPROM();
                 break;
 
-			///////////////////////////
+                ///////////////////////////
 
-			case '?':
-			   	cliPrint("\n");
-			   	cliPrint("'a' Receiver Configuration Data            'A' Set RX Input Type                    AX, 1=Parallel, 2=Serial, 3=Spektrum\n");
-   		        cliPrint("'b' Set Maximum Rate Command               'B' Set RC Control Order                 BTAER1234\n");
-			   	cliPrint("'c' Set Maximum Attitude Command           'C' Set Spektrum Resolution              C0 or C1\n");
-			   	cliPrint("                                           'D' Set Number of Spektrum Channels      D6 thru D12\n");
-			   	cliPrint("                                           'E' Set RC Control Points                EmidCmd;minChk;maxChk;minThrot;maxThrot\n");
-			   	cliPrint("                                           'F' Set Arm/Disarm Counts                FarmCount;disarmCount\n");
-			   	cliPrint("                                           'W' Write EEPROM Parameters\n");
-			   	cliPrint("'x' Exit Receiver CLI                      '?' Command Summary\n");
-			   	cliPrint("\n");
-	    	    break;
+            case '?':
+                cliPrint("\n");
+                cliPrint("'a' Receiver Configuration Data            'A' Set RX Input Type                    AX, 1=Parallel, 2=Serial, 3=Spektrum\n");
+                cliPrint("'b' Set Maximum Rate Command               'B' Set RC Control Order                 BTAER1234\n");
+                cliPrint("'c' Set Maximum Attitude Command           'C' Set Spektrum Resolution              C0 or C1\n");
+                cliPrint("                                           'D' Set Number of Spektrum Channels      D6 thru D12\n");
+                cliPrint("                                           'E' Set RC Control Points                EmidCmd;minChk;maxChk;minThrot;maxThrot\n");
+                cliPrint("                                           'F' Set Arm/Disarm Counts                FarmCount;disarmCount\n");
+                cliPrint("                                           'W' Write EEPROM Parameters\n");
+                cliPrint("'x' Exit Receiver CLI                      '?' Command Summary\n");
+                cliPrint("\n");
+                break;
 
-	    	///////////////////////////
-	    }
-	}
+                ///////////////////////////
+        }
+    }
 
 }
 
@@ -901,40 +916,40 @@ void sensorCLI()
 
     cliPrint("\nEntering Sensor CLI....\n\n");
 
-    while(true)
+    while (true)
     {
         cliPrint("Sensor CLI -> ");
 
-		while ((cliAvailable() == false) && (validQuery == false));
+        while ((cliAvailable() == false) && (validQuery == false));
 
-		if (validQuery == false)
-		    sensorQuery = cliRead();
+        if (validQuery == false)
+            sensorQuery = cliRead();
 
-		cliPrint("\n");
+        cliPrint("\n");
 
-		switch(sensorQuery)
-		{
-            ///////////////////////////
+        switch (sensorQuery)
+        {
+                ///////////////////////////
 
             case 'a': // Sensor Data
                 cliPrintF("\nAccel Temp Comp Slope:     %9.4f, %9.4f, %9.4f\n", eepromConfig.accelTCBiasSlope[XAXIS],
-                                                		                        eepromConfig.accelTCBiasSlope[YAXIS],
-                                                		                        eepromConfig.accelTCBiasSlope[ZAXIS]);
+                          eepromConfig.accelTCBiasSlope[YAXIS],
+                          eepromConfig.accelTCBiasSlope[ZAXIS]);
                 cliPrintF("Accel Temp Comp Bias:      %9.4f, %9.4f, %9.4f\n",   eepromConfig.accelTCBiasIntercept[XAXIS],
-                                                		                        eepromConfig.accelTCBiasIntercept[YAXIS],
-                                                		                        eepromConfig.accelTCBiasIntercept[ZAXIS]);
+                          eepromConfig.accelTCBiasIntercept[YAXIS],
+                          eepromConfig.accelTCBiasIntercept[ZAXIS]);
                 cliPrintF("Gyro Temp Comp Slope:      %9.4f, %9.4f, %9.4f\n",   eepromConfig.gyroTCBiasSlope[ROLL ],
-                                                                		        eepromConfig.gyroTCBiasSlope[PITCH],
-                                                                		        eepromConfig.gyroTCBiasSlope[YAW  ]);
+                          eepromConfig.gyroTCBiasSlope[PITCH],
+                          eepromConfig.gyroTCBiasSlope[YAW  ]);
                 cliPrintF("Gyro Temp Comp Intercept:  %9.4f, %9.4f, %9.4f\n",   eepromConfig.gyroTCBiasIntercept[ROLL ],
-                                                                   		        eepromConfig.gyroTCBiasIntercept[PITCH],
-                                                                   		        eepromConfig.gyroTCBiasIntercept[YAW  ]);
+                          eepromConfig.gyroTCBiasIntercept[PITCH],
+                          eepromConfig.gyroTCBiasIntercept[YAW  ]);
                 cliPrintF("Gyro TC Bias Intercept:    %9.4f, %9.4f, %9.4f\n",   eepromConfig.gyroTCBiasIntercept[ROLL ],
-                   		                                                        eepromConfig.gyroTCBiasIntercept[PITCH],
-                   		                                                        eepromConfig.gyroTCBiasIntercept[YAW  ]);
+                          eepromConfig.gyroTCBiasIntercept[PITCH],
+                          eepromConfig.gyroTCBiasIntercept[YAW  ]);
                 cliPrintF("Mag Bias:                  %9.4f, %9.4f, %9.4f\n",   eepromConfig.magBias[XAXIS],
-                                                   		                        eepromConfig.magBias[YAXIS],
-                                                   		                        eepromConfig.magBias[ZAXIS]);
+                          eepromConfig.magBias[YAXIS],
+                          eepromConfig.magBias[ZAXIS]);
                 cliPrintF("Accel One G:               %9.4f\n",   accelOneG);
                 cliPrintF("Accel Cutoff:              %9.4f\n",   eepromConfig.accelCutoff);
                 cliPrintF("KpAcc (MARG):              %9.4f\n",   eepromConfig.KpAcc);
@@ -945,42 +960,47 @@ void sensorCLI()
                 cliPrintF("hdot est/h est Comp Fil B: %9.4f\n",   eepromConfig.compFilterB);
 
                 cliPrint("MPU6000 DLPF:                 ");
-                switch(eepromConfig.dlpfSetting)
+
+                switch (eepromConfig.dlpfSetting)
                 {
                     case DLPF_256HZ:
                         cliPrint("256 Hz\n");
                         break;
+
                     case DLPF_188HZ:
                         cliPrint("188 Hz\n");
                         break;
+
                     case DLPF_98HZ:
                         cliPrint("98 Hz\n");
                         break;
+
                     case DLPF_42HZ:
                         cliPrint("42 Hz\n");
                         break;
                 }
 
                 cliPrint("Magnetic Variation:           ");
+
                 if (eepromConfig.magVar >= 0.0f)
-                  cliPrintF("E%6.4f\n",  eepromConfig.magVar * R2D);
+                    cliPrintF("E%6.4f\n",  eepromConfig.magVar * R2D);
                 else
-                  cliPrintF("W%6.4f\n", -eepromConfig.magVar * R2D);
+                    cliPrintF("W%6.4f\n", -eepromConfig.magVar * R2D);
 
                 cliPrintF("Battery Voltage Divider:   %9.4f\n\n", eepromConfig.batteryVoltageDivider);
 
                 cliPrintF("MXR Accel Bias:            %9.4f, %9.4f, %9.4f\n",   eepromConfig.accelBiasMXR[XAXIS],
-				                                                		        eepromConfig.accelBiasMXR[YAXIS],
-				                                                		        eepromConfig.accelBiasMXR[ZAXIS]);
-				cliPrintF("MXR Accel Scale Factor:    %9.4f, %9.4f, %9.4f\n",   eepromConfig.accelScaleFactorMXR[XAXIS],
-								                                                eepromConfig.accelScaleFactorMXR[YAXIS],
-				                                                		        eepromConfig.accelScaleFactorMXR[ZAXIS]);
+                          eepromConfig.accelBiasMXR[YAXIS],
+                          eepromConfig.accelBiasMXR[ZAXIS]);
+                cliPrintF("MXR Accel Scale Factor:    %9.4f, %9.4f, %9.4f\n",   eepromConfig.accelScaleFactorMXR[XAXIS],
+                          eepromConfig.accelScaleFactorMXR[YAXIS],
+                          eepromConfig.accelScaleFactorMXR[ZAXIS]);
 
 
                 validQuery = false;
                 break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case 'b': // MPU6000 Calibration
                 mpu6000Calibration();
@@ -989,7 +1009,7 @@ void sensorCLI()
                 validQuery = true;
                 break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case 'c': // Magnetometer Calibration
                 magCalibration(HMC5883L_I2C);
@@ -998,7 +1018,7 @@ void sensorCLI()
                 validQuery = true;
                 break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case 'd': // Accel Bias and Scale Factor Calibration
                 accelCalibration();
@@ -1007,44 +1027,44 @@ void sensorCLI()
                 validQuery = true;
                 break;
 
-			///////////////////////////
+                ///////////////////////////
 
-        	case 'x':
-			    cliPrint("\nExiting Sensor CLI....\n\n");
-			    cliBusy = false;
-			    return;
-			    break;
+            case 'x':
+                cliPrint("\nExiting Sensor CLI....\n\n");
+                cliBusy = false;
+                return;
+                break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case 'A': // Set MPU6000 Digital Low Pass Filter
                 tempInt = (uint8_t)readFloatCLI();
 
-                switch(tempInt)
+                switch (tempInt)
                 {
                     case DLPF_256HZ:
                         eepromConfig.dlpfSetting = BITS_DLPF_CFG_256HZ;
                         break;
 
                     case DLPF_188HZ:
-                    	eepromConfig.dlpfSetting = BITS_DLPF_CFG_188HZ;
-                    	break;
+                        eepromConfig.dlpfSetting = BITS_DLPF_CFG_188HZ;
+                        break;
 
                     case DLPF_98HZ:
-                    	eepromConfig.dlpfSetting = BITS_DLPF_CFG_98HZ;
-                    	break;
+                        eepromConfig.dlpfSetting = BITS_DLPF_CFG_98HZ;
+                        break;
 
                     case DLPF_42HZ:
-                    	eepromConfig.dlpfSetting = BITS_DLPF_CFG_42HZ;
-                     	break;
+                        eepromConfig.dlpfSetting = BITS_DLPF_CFG_42HZ;
+                        break;
                 }
 
                 setSPIdivisor(MPU6000_SPI, 64);  // 0.65625 MHz SPI clock (within 20 +/- 10%)
 
                 GPIO_ResetBits(MPU6000_CS_GPIO, MPU6000_CS_PIN);
-			    spiTransfer(MPU6000_SPI, MPU6000_CONFIG);
-			    spiTransfer(MPU6000_SPI, eepromConfig.dlpfSetting);
-			    GPIO_SetBits(MPU6000_CS_GPIO, MPU6000_CS_PIN);
+                spiTransfer(MPU6000_SPI, MPU6000_CONFIG);
+                spiTransfer(MPU6000_SPI, eepromConfig.dlpfSetting);
+                GPIO_SetBits(MPU6000_CS_GPIO, MPU6000_CS_PIN);
 
                 setSPIdivisor(MPU6000_SPI, 2);  // 21 MHz SPI clock (within 20 +/- 10%)
 
@@ -1052,16 +1072,16 @@ void sensorCLI()
                 validQuery = true;
                 break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case 'B': // Accel Cutoff
                 eepromConfig.accelCutoff = readFloatCLI();
 
                 sensorQuery = 'a';
                 validQuery = true;
-        	    break;
+                break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case 'C': // kpAcc, kiAcc
                 eepromConfig.KpAcc = readFloatCLI();
@@ -1071,7 +1091,7 @@ void sensorCLI()
                 validQuery = true;
                 break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case 'D': // kpMag, kiMag
                 eepromConfig.KpMag = readFloatCLI();
@@ -1081,7 +1101,7 @@ void sensorCLI()
                 validQuery = true;
                 break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case 'E': // h dot est/h est Comp Filter A/B
                 eepromConfig.compFilterA = readFloatCLI();
@@ -1091,7 +1111,7 @@ void sensorCLI()
                 validQuery = true;
                 break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case 'M': // Magnetic Variation
                 eepromConfig.magVar = readFloatCLI() * D2R;
@@ -1100,7 +1120,7 @@ void sensorCLI()
                 validQuery = true;
                 break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case 'V': // Set Battery Voltage Divider
                 eepromConfig.batteryVoltageDivider = readFloatCLI();
@@ -1109,32 +1129,32 @@ void sensorCLI()
                 validQuery = true;
                 break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case 'W': // Write EEPROM Parameters
                 cliPrint("\nWriting EEPROM Parameters....\n\n");
                 writeEEPROM();
                 break;
 
-			///////////////////////////
+                ///////////////////////////
 
-			case '?':
-			   	cliPrint("\n");
-			   	cliPrint("'a' Display Sensor Data                    'A' Set MPU6000 DLPF                     A0 thru 3, see aq32Plus.h\n");
-			   	cliPrint("'b' MPU6000 Temp Calibration               'B' Set Accel Cutoff                     BAccelCutoff\n");
-			   	cliPrint("'c' Magnetometer Calibration               'C' Set kpAcc/kiAcc                      CkpAcc;kiAcc\n");
-			   	cliPrint("'d' Accel Bias and SF Calibraiton          'D' Set kpMag/kiMag                      DkpMag;kiMag\n");
-			   	cliPrint("                                           'E' Set h dot est/h est Comp Filter A/B  EA;B\n");
-			   	cliPrint("                                           'M' Set Mag Variation (+ East, - West)   MMagVar\n");
-			   	cliPrint("                                           'V' Set Battery Voltage Divider          VbatVoltDivider\n");
-			   	cliPrint("                                           'W' Write EEPROM Parameters\n");
-			   	cliPrint("'x' Exit Sensor CLI                        '?' Command Summary\n");
-			    cliPrint("\n");
-	    	    break;
+            case '?':
+                cliPrint("\n");
+                cliPrint("'a' Display Sensor Data                    'A' Set MPU6000 DLPF                     A0 thru 3, see aq32Plus.h\n");
+                cliPrint("'b' MPU6000 Temp Calibration               'B' Set Accel Cutoff                     BAccelCutoff\n");
+                cliPrint("'c' Magnetometer Calibration               'C' Set kpAcc/kiAcc                      CkpAcc;kiAcc\n");
+                cliPrint("'d' Accel Bias and SF Calibraiton          'D' Set kpMag/kiMag                      DkpMag;kiMag\n");
+                cliPrint("                                           'E' Set h dot est/h est Comp Filter A/B  EA;B\n");
+                cliPrint("                                           'M' Set Mag Variation (+ East, - West)   MMagVar\n");
+                cliPrint("                                           'V' Set Battery Voltage Divider          VbatVoltDivider\n");
+                cliPrint("                                           'W' Write EEPROM Parameters\n");
+                cliPrint("'x' Exit Sensor CLI                        '?' Command Summary\n");
+                cliPrint("\n");
+                break;
 
-	    	///////////////////////////
-	    }
-	}
+                ///////////////////////////
+        }
+    }
 
 }
 
@@ -1144,76 +1164,76 @@ void sensorCLI()
 
 void gpsCLI()
 {
-	USART_InitTypeDef USART_InitStructure;
+    USART_InitTypeDef USART_InitStructure;
 
-	uint8_t  gpsQuery;
+    uint8_t  gpsQuery;
     uint8_t  validQuery = false;
 
     cliBusy = true;
 
     cliPrint("\nEntering GPS CLI....\n\n");
 
-    while(true)
+    while (true)
     {
         cliPrint("GPS CLI -> ");
 
-		while ((cliAvailable() == false) && (validQuery == false));
+        while ((cliAvailable() == false) && (validQuery == false));
 
-		if (validQuery == false)
-		    gpsQuery = cliRead();
+        if (validQuery == false)
+            gpsQuery = cliRead();
 
-		cliPrint("\n");
+        cliPrint("\n");
 
-		switch(gpsQuery)
-		{
-            ///////////////////////////
+        switch (gpsQuery)
+        {
+                ///////////////////////////
 
             case 'a': // GPS Installation Data
                 cliPrint("\n");
 
-				switch(eepromConfig.gpsType)
-				{
-					///////////////
+                switch (eepromConfig.gpsType)
+                {
+                        ///////////////
 
-					case NO_GPS:
-					    cliPrint("No GPS Installed....\n\n");
-					    break;
+                    case NO_GPS:
+                        cliPrint("No GPS Installed....\n\n");
+                        break;
 
-					///////////////
+                        ///////////////
 
-					case MEDIATEK_3329_BINARY:
-					    cliPrint("MediaTek 3329 GPS installed, Binary Mode....\n\n");
-					    break;
+                    case MEDIATEK_3329_BINARY:
+                        cliPrint("MediaTek 3329 GPS installed, Binary Mode....\n\n");
+                        break;
 
-					///////////////
+                        ///////////////
 
-					case MEDIATEK_3329_NMEA:
-					    cliPrint("MediaTek 3329 GPS Installed, NMEA Mode....\n\n");
-					    break;
+                    case MEDIATEK_3329_NMEA:
+                        cliPrint("MediaTek 3329 GPS Installed, NMEA Mode....\n\n");
+                        break;
 
-					///////////////
+                        ///////////////
 
-					case UBLOX:
-					    cliPrint("UBLOX GPS Installed, Binary Mode....\n\n");
-					    break;
+                    case UBLOX:
+                        cliPrint("UBLOX GPS Installed, Binary Mode....\n\n");
+                        break;
 
-					///////////////
-				}
+                        ///////////////
+                }
 
                 cliPrintF("GPS Baud Rate: %6ld\n\n", eepromConfig.gpsBaudRate);
 
                 validQuery = false;
                 break;
 
-            ///////////////////////////
+                ///////////////////////////
 
-			case 'x':
-			    cliPrint("\nExiting GPS CLI....\n\n");
-			    cliBusy = false;
-			    return;
-			    break;
+            case 'x':
+                cliPrint("\nExiting GPS CLI....\n\n");
+                cliBusy = false;
+                return;
+                break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case 'A': // Set GPS Installed State to False
                 eepromConfig.gpsType = NO_GPS;
@@ -1222,7 +1242,7 @@ void gpsCLI()
                 validQuery = true;
                 break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case 'B': // Set GPS Type to MediaTek 3329 Binary
                 eepromConfig.gpsType = MEDIATEK_3329_BINARY;
@@ -1231,9 +1251,9 @@ void gpsCLI()
 
                 gpsQuery = 'a';
                 validQuery = true;
-        	    break;
+                break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case 'C': // Set GPS Type to MediaTek 3329 NMEA
                 eepromConfig.gpsType = MEDIATEK_3329_NMEA;
@@ -1244,7 +1264,7 @@ void gpsCLI()
                 validQuery = true;
                 break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case 'D': // Set GPS Type to UBLOX Binary
                 eepromConfig.gpsType = UBLOX;
@@ -1255,7 +1275,7 @@ void gpsCLI()
                 validQuery = true;
                 break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case 'S': // Read ESC and Servo PWM Update Rates
                 eepromConfig.gpsBaudRate = (uint16_t)readFloatCLI();
@@ -1268,32 +1288,32 @@ void gpsCLI()
 
                 gpsQuery = 'a';
                 validQuery = true;
-        	    break;
+                break;
 
-            ///////////////////////////
+                ///////////////////////////
 
             case 'W': // Write EEPROM Parameters
                 cliPrint("\nWriting EEPROM Parameters....\n\n");
                 writeEEPROM();
                 break;
 
-			///////////////////////////
+                ///////////////////////////
 
-			case '?':
-			   	cliPrint("\n");
-			   	cliPrint("'a' Display GPS Installation Data          'A' Set GPS Type to No GPS\n");
-			   	cliPrint("                                           'B' Set GPS Type to MediaTek 3329 Binary\n");
-			   	cliPrint("                                           'C' Set GPS Type to MediaTek 3329 NMEA\n");
-			   	cliPrint("                                           'D' Set GPS Type to UBLOX\n");
-			   	cliPrint("                                           'S' Set GPS Baud Rate\n");
-			    cliPrint("                                           'W' Write EEPROM Parameters\n");
-			   	cliPrint("'x' Exit GPS CLI                           '?' Command Summary\n");
-			    cliPrint("\n");
-	    	    break;
+            case '?':
+                cliPrint("\n");
+                cliPrint("'a' Display GPS Installation Data          'A' Set GPS Type to No GPS\n");
+                cliPrint("                                           'B' Set GPS Type to MediaTek 3329 Binary\n");
+                cliPrint("                                           'C' Set GPS Type to MediaTek 3329 NMEA\n");
+                cliPrint("                                           'D' Set GPS Type to UBLOX\n");
+                cliPrint("                                           'S' Set GPS Baud Rate\n");
+                cliPrint("                                           'W' Write EEPROM Parameters\n");
+                cliPrint("'x' Exit GPS CLI                           '?' Command Summary\n");
+                cliPrint("\n");
+                break;
 
-	    	///////////////////////////
-	    }
-	}
+                ///////////////////////////
+        }
+    }
 
 }
 

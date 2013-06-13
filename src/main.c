@@ -65,14 +65,16 @@ int main(void)
 
 #ifdef _DTIMING
 
-#define LA1_ENABLE       GPIO_SetBits(GPIOA,   GPIO_Pin_4)
-#define LA1_DISABLE      GPIO_ResetBits(GPIOA, GPIO_Pin_4)
-#define LA4_ENABLE       GPIO_SetBits(GPIOC,   GPIO_Pin_5)
-#define LA4_DISABLE      GPIO_ResetBits(GPIOC, GPIO_Pin_5)
-#define LA2_ENABLE       GPIO_SetBits(GPIOC,   GPIO_Pin_2)
-#define LA2_DISABLE      GPIO_ResetBits(GPIOC, GPIO_Pin_2)
-#define LA3_ENABLE       GPIO_SetBits(GPIOC,   GPIO_Pin_3)
-#define LA3_DISABLE      GPIO_ResetBits(GPIOC, GPIO_Pin_3)
+#define LA0_ENABLE		  GPIO_SetBits(GPIOC,   GPIO_Pin_1) // MPX
+#define LA0_DISABLE		  GPIO_ResetBits(GPIOC, GPIO_Pin_1) // MPX
+#define LA1_ENABLE      GPIO_SetBits(GPIOA,   GPIO_Pin_4) // DAC
+#define LA1_DISABLE     GPIO_ResetBits(GPIOA, GPIO_Pin_4) // DAC
+#define LA2_ENABLE      GPIO_SetBits(GPIOC,   GPIO_Pin_2) // ADC5
+#define LA2_DISABLE     GPIO_ResetBits(GPIOC, GPIO_Pin_2) // ADC5
+#define LA3_ENABLE      GPIO_SetBits(GPIOC,   GPIO_Pin_3) // ADC6
+#define LA3_DISABLE		  GPIO_ResetBits(GPIOC, GPIO_Pin_3) // ADC6
+#define LA4_ENABLE      GPIO_SetBits(GPIOC,   GPIO_Pin_5) // ADC4
+#define LA4_DISABLE     GPIO_ResetBits(GPIOC, GPIO_Pin_5) // ADC4
 
     GPIO_InitTypeDef GPIO_InitStructure;
 
@@ -101,7 +103,7 @@ int main(void)
     GPIO_Init(GPIOB, &GPIO_InitStructure);
 
     // Init pins
-    GPIO_InitStructure.GPIO_Pin   = GPIO_Pin_2 | GPIO_Pin_3 | GPIO_Pin_5;
+    GPIO_InitStructure.GPIO_Pin   = GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_3 | GPIO_Pin_5;
     //GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_OUT;
     //GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
     //GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
@@ -109,11 +111,12 @@ int main(void)
 
     GPIO_Init(GPIOC, &GPIO_InitStructure);
 
-    //	    PB0_DISABLE;
+    //      PB0_DISABLE;
     LA4_DISABLE;
     LA2_DISABLE;
     LA3_DISABLE;
     LA1_DISABLE;
+    LA0_DISABLE;
 
 #endif
 
@@ -237,7 +240,8 @@ int main(void)
             {
                 // Vertical Variables
 #if (TELEM_PRINT == 1)
-                telemetryPrintF("%9.4f, %9.4f, %9.4f, %9.4f, %9.4f, %9.4f, %9.4f, %9.4f, %9.4f\n", sensors.accel500Hz[XAXIS],
+                telemetryPrintF("%9.4f, %9.4f, %9.4f, %9.4f, %9.4f, %9.4f, %9.4f, %9.4f, %9.4f\n",
+                                sensors.accel500Hz[XAXIS],
                                 sensors.accel500Hz[YAXIS],
                                 sensors.accel500Hz[ZAXIS],
                                 sensors.gyro500Hz[ROLL ],
@@ -249,7 +253,8 @@ int main(void)
 #endif
 
 #if (TELEM_LOG == 1)
-                logPrintF("%9.4f, %9.4f, %9.4f, %9.4f, %9.4f, %9.4f, %9.4f, %9.4f, %9.4f\n", sensors.accel500Hz[XAXIS],
+                logPrintF("%9.4f, %9.4f, %9.4f, %9.4f, %9.4f, %9.4f, %9.4f, %9.4f, %9.4f\n",
+                          sensors.accel500Hz[XAXIS],
                           sensors.accel500Hz[YAXIS],
                           sensors.accel500Hz[ZAXIS],
                           sensors.gyro500Hz[ROLL ],
@@ -437,7 +442,8 @@ int main(void)
             {
                 // 500 Hz Accels
 #if (TELEM_PRINT == 1)
-                telemetryPrintF("%9.4f, %9.4f, %9.4f, %9.4f, %9.4f, %9.4f\n", sensors.accel500Hz[XAXIS],
+                telemetryPrintF("%9.4f, %9.4f, %9.4f, %9.4f, %9.4f, %9.4f\n",
+                                sensors.accel500Hz[XAXIS],
                                 sensors.accel500Hz[YAXIS],
                                 sensors.accel500Hz[ZAXIS],
                                 sensors.accel500HzMXR[XAXIS],
@@ -446,7 +452,8 @@ int main(void)
 #endif
 
 #if (TELEM_LOG == 1)
-                logPrintF("%9.4f, %9.4f, %9.4f, %9.4f, %9.4f, %9.4f\n", sensors.accel500Hz[XAXIS],
+                logPrintF("%9.4f, %9.4f, %9.4f, %9.4f, %9.4f, %9.4f\n",
+                          sensors.accel500Hz[XAXIS],
                           sensors.accel500Hz[YAXIS],
                           sensors.accel500Hz[ZAXIS],
                           sensors.accel500HzMXR[XAXIS],
@@ -459,13 +466,15 @@ int main(void)
             {
                 // 500 Hz Gyros
 #if (TELEM_PRINT == 1)
-                telemetryPrintF("%9.4f, %9.4f, %9.4f\n", sensors.gyro500Hz[ROLL ],
+                telemetryPrintF("%9.4f, %9.4f, %9.4f\n",
+                                sensors.gyro500Hz[ROLL ],
                                 sensors.gyro500Hz[PITCH],
                                 sensors.gyro500Hz[YAW  ]);
 #endif
 
 #if (TELEM_LOG == 1)
-                logPrintF("%9.4f, %9.4f, %9.4f\n", sensors.gyro500Hz[ROLL ],
+                logPrintF("%9.4f, %9.4f, %9.4f\n",
+                          sensors.gyro500Hz[ROLL ],
                           sensors.gyro500Hz[PITCH],
                           sensors.gyro500Hz[YAW  ]);
 #endif
@@ -476,13 +485,15 @@ int main(void)
             {
                 // Earth Axis Accels
 #if (TELEM_PRINT == 1)
-                telemetryPrintF("%9.4f, %9.4f, %9.4f\n", earthAxisAccels[XAXIS],
+                telemetryPrintF("%9.4f, %9.4f, %9.4f\n",
+                                earthAxisAccels[XAXIS],
                                 earthAxisAccels[YAXIS],
                                 earthAxisAccels[ZAXIS]);
 #endif
 
 #if (TELEM_LOG == 1)
-                logPrintF("%9.4f, %9.4f, %9.4f\n", earthAxisAccels[XAXIS],
+                logPrintF("%9.4f, %9.4f, %9.4f\n",
+                          earthAxisAccels[XAXIS],
                           earthAxisAccels[YAXIS],
                           earthAxisAccels[ZAXIS]);
 #endif
@@ -493,13 +504,15 @@ int main(void)
             {
                 // 500 Hz Attitudes
 #if (TELEM_PRINT == 1)
-                telemetryPrintF("%9.4f, %9.4f, %9.4f\n", sensors.attitude500Hz[ROLL ],
+                telemetryPrintF("%9.4f, %9.4f, %9.4f\n",
+                                sensors.attitude500Hz[ROLL ],
                                 sensors.attitude500Hz[PITCH],
                                 sensors.attitude500Hz[YAW  ]);
 #endif
 
 #if (TELEM_LOG == 1)
-                logPrintF("%9.4f, %9.4f, %9.4f\n", sensors.attitude500Hz[ROLL ],
+                logPrintF("%9.4f, %9.4f, %9.4f\n",
+                          sensors.attitude500Hz[ROLL ],
                           sensors.attitude500Hz[PITCH],
                           sensors.attitude500Hz[YAW  ]);
 #endif
@@ -509,15 +522,19 @@ int main(void)
             {
                 // Vertical Variables
 #if (TELEM_PRINT == 1)
-                telemetryPrintF("%9.4f, %9.4f, %9.4f, %9.4f\n", earthAxisAccels[ZAXIS],
+                telemetryPrintF("%9.4f, %9.4f, %9ld, %9.4f, %9.4f\n",
+                                earthAxisAccels[ZAXIS],
                                 sensors.pressureAlt50Hz,
+                                sensors.ipress,
                                 hDotEstimate,
                                 hEstimate);
 #endif
 
 #if (TELEM_LOG == 1)
-                logPrintF("%9.4f, %9.4f, %9.4f, %9.4f\n", earthAxisAccels[ZAXIS],
+                logPrintF("%9.4f, %9.4f, %9.4f, %9.4f\n",
+                          earthAxisAccels[ZAXIS],
                           sensors.pressureAlt50Hz,
+                          //                        sensors.ipress,
                           hDotEstimate,
                           hEstimate);
 #endif

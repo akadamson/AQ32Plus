@@ -50,7 +50,7 @@ float rotationMatrix[9];
 
 void createRotationMatrix(void)
 {
-    rotationMatrix[0] = q0q0 + q1q1 -q2q2 - q3q3;
+    rotationMatrix[0] = q0q0 + q1q1 - q2q2 - q3q3;
 
     rotationMatrix[1] = 2.0f * (q1q2 - q0q3);
 
@@ -81,13 +81,13 @@ void bodyAccelToEarthAccel(void)
 
     arm_mat_init_f32(&a, 3, 3, (float *)rotationMatrix);
 
-    #if defined(MPU_ACCEL)
-        arm_mat_init_f32(&b, 3, 1, (float *)sensors.accel100Hz);
-    #endif
+#if defined(MPU_ACCEL)
+    arm_mat_init_f32(&b, 3, 1, (float *)sensors.accel100Hz);
+#endif
 
-    #if defined(MXR_ACCEL)
-        arm_mat_init_f32(&b, 3, 1, (float *)sensors.accel100HzMXR);
-    #endif
+#if defined(MXR_ACCEL)
+    arm_mat_init_f32(&b, 3, 1, (float *)sensors.accel100HzMXR);
+#endif
 
     arm_mat_init_f32(&x, 3, 1,          earthAxisAccels);
 

@@ -79,9 +79,9 @@ uint16_t sphereFit(float    d[][3],
                    uint16_t N,
                    uint16_t MaxIterations,
                    float    Err,
-		           uint16_t Population[][3],
-		           float    SphereOrigin[],
-		           float    * SphereRadius);
+                   uint16_t Population[][3],
+                   float    SphereOrigin[],
+                   float     *SphereRadius);
 
 ///////////////////////////////////////////////////////////////////////////////
 //  Standard Radian Format Limiter

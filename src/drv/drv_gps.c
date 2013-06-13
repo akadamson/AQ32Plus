@@ -71,19 +71,20 @@ volatile uint8_t  tx2DmaEnabled = false;
 
 static void uart2TxDMA(void)
 {
-	if ((tx2DmaEnabled == true) || (tx2BufferHead == tx2BufferTail))  // Ignore call if already active or no new data in buffer
-    	return;
+    if ((tx2DmaEnabled == true) || (tx2BufferHead == tx2BufferTail))  // Ignore call if already active or no new data in buffer
+        return;
 
     DMA1_Stream6->M0AR = (uint32_t)&tx2Buffer[tx2BufferTail];
+
     if (tx2BufferHead > tx2BufferTail)
     {
-	    DMA_SetCurrDataCounter(DMA1_Stream6, tx2BufferHead - tx2BufferTail);
-	    tx2BufferTail = tx2BufferHead;
+        DMA_SetCurrDataCounter(DMA1_Stream6, tx2BufferHead - tx2BufferTail);
+        tx2BufferTail = tx2BufferHead;
     }
     else
     {
-	    DMA_SetCurrDataCounter(DMA1_Stream6, UART2_BUFFER_SIZE - tx2BufferTail);
-	    tx2BufferTail = 0;
+        DMA_SetCurrDataCounter(DMA1_Stream6, UART2_BUFFER_SIZE - tx2BufferTail);
+        tx2BufferTail = 0;
     }
 
     tx2DmaEnabled = true;
@@ -143,11 +144,11 @@ void gpsInit(void)
     NVIC_Init(&NVIC_InitStructure);
 
     USART_InitStructure.USART_BaudRate            = eepromConfig.gpsBaudRate;
-  //USART_InitStructure.USART_WordLength          = USART_WordLength_8b;
-  //USART_InitStructure.USART_StopBits            = USART_StopBits_1;
-  //USART_InitStructure.USART_Parity              = USART_Parity_No;
-  //USART_InitStructure.USART_Mode                = USART_Mode_Rx | USART_Mode_Tx;
-  //USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
+    //USART_InitStructure.USART_WordLength          = USART_WordLength_8b;
+    //USART_InitStructure.USART_StopBits            = USART_StopBits_1;
+    //USART_InitStructure.USART_Parity              = USART_Parity_No;
+    //USART_InitStructure.USART_Mode                = USART_Mode_Rx | USART_Mode_Tx;
+    //USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
 
     USART_Init(USART2, &USART_InitStructure);
 
@@ -158,18 +159,18 @@ void gpsInit(void)
     DMA_InitStructure.DMA_Channel            = DMA_Channel_4;
     DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)&USART2->DR;
     DMA_InitStructure.DMA_Memory0BaseAddr    = (uint32_t)rx2Buffer;
-  //DMA_InitStructure.DMA_DIR                = DMA_DIR_PeripheralToMemory;
+    //DMA_InitStructure.DMA_DIR                = DMA_DIR_PeripheralToMemory;
     DMA_InitStructure.DMA_BufferSize         = UART2_BUFFER_SIZE;
-  //DMA_InitStructure.DMA_PeripheralInc      = DMA_PeripheralInc_Disable;
+    //DMA_InitStructure.DMA_PeripheralInc      = DMA_PeripheralInc_Disable;
     DMA_InitStructure.DMA_MemoryInc          = DMA_MemoryInc_Enable;
-  //DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte;
-  //DMA_InitStructure.DMA_MemoryDataSize     = DMA_MemoryDataSize_Byte;
+    //DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte;
+    //DMA_InitStructure.DMA_MemoryDataSize     = DMA_MemoryDataSize_Byte;
     DMA_InitStructure.DMA_Mode               = DMA_Mode_Circular;
     DMA_InitStructure.DMA_Priority           = DMA_Priority_Medium;
-  //DMA_InitStructure.DMA_FIFOMode           = DMA_FIFOMode_Disable;
-  //DMA_InitStructure.DMA_FIFOThreshold      = DMA_FIFOThreshold_1QuarterFull;
-  //DMA_InitStructure.DMA_MemoryBurst        = DMA_MemoryBurst_Single;
-  //DMA_InitStructure.DMA_PeripheralBurst    = DMA_PeripheralBurst_Single;
+    //DMA_InitStructure.DMA_FIFOMode           = DMA_FIFOMode_Disable;
+    //DMA_InitStructure.DMA_FIFOThreshold      = DMA_FIFOThreshold_1QuarterFull;
+    //DMA_InitStructure.DMA_MemoryBurst        = DMA_MemoryBurst_Single;
+    //DMA_InitStructure.DMA_PeripheralBurst    = DMA_PeripheralBurst_Single;
 
     DMA_Init(DMA1_Stream5, &DMA_InitStructure);
 
@@ -182,21 +183,21 @@ void gpsInit(void)
     // Transmit DMA
     DMA_DeInit(DMA1_Stream6);
 
-  //DMA_InitStructure.DMA_Channel            = DMA_Channel_4;
-  //DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)&USART2->DR;
+    //DMA_InitStructure.DMA_Channel            = DMA_Channel_4;
+    //DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)&USART2->DR;
     DMA_InitStructure.DMA_Memory0BaseAddr    = (uint32_t)tx2Buffer;
     DMA_InitStructure.DMA_DIR                = DMA_DIR_MemoryToPeripheral;
-  //DMA_InitStructure.DMA_BufferSize         = UART_BUFFER_SIZE;
-  //DMA_InitStructure.DMA_PeripheralInc      = DMA_PeripheralInc_Disable;
-  //DMA_InitStructure.DMA_MemoryInc          = DMA_MemoryInc_Enable;
-  //DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte;
-  //DMA_InitStructure.DMA_MemoryDataSize     = DMA_MemoryDataSize_Byte;
+    //DMA_InitStructure.DMA_BufferSize         = UART_BUFFER_SIZE;
+    //DMA_InitStructure.DMA_PeripheralInc      = DMA_PeripheralInc_Disable;
+    //DMA_InitStructure.DMA_MemoryInc          = DMA_MemoryInc_Enable;
+    //DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte;
+    //DMA_InitStructure.DMA_MemoryDataSize     = DMA_MemoryDataSize_Byte;
     DMA_InitStructure.DMA_Mode               = DMA_Mode_Normal;
-  //DMA_InitStructure.DMA_Priority           = DMA_Priority_Medium;
-  //DMA_InitStructure.DMA_FIFOMode           = DMA_FIFOMode_Disable;
-  //DMA_InitStructure.DMA_FIFOThreshold      = DMA_FIFOThreshold_1QuarterFull;
-  //DMA_InitStructure.DMA_MemoryBurst        = DMA_MemoryBurst_Single;
-  //DMA_InitStructure.DMA_PeripheralBurst    = DMA_PeripheralBurst_Single;
+    //DMA_InitStructure.DMA_Priority           = DMA_Priority_Medium;
+    //DMA_InitStructure.DMA_FIFOMode           = DMA_FIFOMode_Disable;
+    //DMA_InitStructure.DMA_FIFOThreshold      = DMA_FIFOThreshold_1QuarterFull;
+    //DMA_InitStructure.DMA_MemoryBurst        = DMA_MemoryBurst_Single;
+    //DMA_InitStructure.DMA_PeripheralBurst    = DMA_PeripheralBurst_Single;
 
     DMA_Init(DMA1_Stream6, &DMA_InitStructure);
 
@@ -233,14 +234,14 @@ void gpsClearBuffer(void)
 
 uint16_t gpsNumCharsAvailable(void)
 {
-	int32_t number;
+    int32_t number;
 
-	number = rx2DMAPos - DMA_GetCurrDataCounter(DMA1_Stream5);
+    number = rx2DMAPos - DMA_GetCurrDataCounter(DMA1_Stream5);
 
-	if (number >= 0)
-	    return (uint16_t)number;
-	else
-	    return (uint16_t)(UART2_BUFFER_SIZE + number);
+    if (number >= 0)
+        return (uint16_t)number;
+    else
+        return (uint16_t)(UART2_BUFFER_SIZE + number);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -252,9 +253,10 @@ uint8_t gpsRead(void)
     uint8_t ch;
 
     ch = rx2Buffer[UART2_BUFFER_SIZE - rx2DMAPos];
+
     // go back around the buffer
     if (--rx2DMAPos == 0)
-	    rx2DMAPos = UART2_BUFFER_SIZE;
+        rx2DMAPos = UART2_BUFFER_SIZE;
 
     return ch;
 }
@@ -266,6 +268,7 @@ uint8_t gpsRead(void)
 uint8_t gpsReadPoll(void)
 {
     while (!gpsAvailable()); // wait for some bytes
+
     return gpsRead();
 }
 
@@ -289,11 +292,11 @@ void gpsPrint(char *str)
 {
     while (*str)
     {
-    	tx2Buffer[tx2BufferHead] = *str++;
-    	tx2BufferHead = (tx2BufferHead + 1) % UART2_BUFFER_SIZE;
+        tx2Buffer[tx2BufferHead] = *str++;
+        tx2BufferHead = (tx2BufferHead + 1) % UART2_BUFFER_SIZE;
     }
 
-	uart2TxDMA();
+    uart2TxDMA();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
