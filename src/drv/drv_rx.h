@@ -49,6 +49,8 @@ extern uint8_t rcActive;
 #define SPEKTRUM_MAX_CHANNEL 12
 
 extern uint32_t spektrumChannelData[SPEKTRUM_MAX_CHANNEL];
+extern uint8_t  spektrumChannelMask;
+extern uint8_t  spektrumChannelShift;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Receiver Initialization

@@ -40,9 +40,6 @@
 // AltitudeHold Display
 ///////////////////////////////////////////////////////////////////////////////
 
-#define ALTITUDE_ROW 1
-#define ALTITUDE_COL 1
-
 uint8_t lastHoldState    = 6;
 int16_t lastAltitude     = 12345;     // bogus value to force update
 int16_t lastHoldAltitude = 12345;     // bogus value to force update
@@ -83,7 +80,7 @@ void displayAltitude(float pressureAltitude, float altitudeReference, uint8_t al
 		    snprintf(buf,7,"\011%4df",currentAltitude);
 	    }
 
-        writeMax7456Chars(buf, 6, 0, ALTITUDE_ROW, ALTITUDE_COL);
+        writeMax7456Chars(buf, 6, 0, eepromConfig.osdDisplayAltRow, eepromConfig.osdDisplayAltCol);
 
         lastAltitude = currentAltitude;
     }
@@ -92,55 +89,58 @@ void displayAltitude(float pressureAltitude, float altitudeReference, uint8_t al
     // - show hold altitude when it is active
     // - show "panic" if 'paniced' out
 
-    switch (altHoldState)
+    if (eepromConfig.osdDisplayAltHoldState)
     {
-        case DISENGAGED:
-            if (lastHoldState != DISENGAGED)
-            {
-                lastHoldState = DISENGAGED;
-                memset(buf,0,6);
-                isWriteNeeded = true;
-            }
-            break;
+	switch (altHoldState)
+	{
+	    case DISENGAGED:
+		if (lastHoldState != DISENGAGED)
+		{
+		    lastHoldState = DISENGAGED;
+		    memset(buf,0,6);
+		    isWriteNeeded = true;
+		}
+		break;
 
-        case ENGAGED:
-            if ((lastHoldState != ENGAGED) || (lastHoldAltitude != currentHoldAltitude))
-            {
-                lastHoldState = ENGAGED;
-                lastHoldAltitude = currentHoldAltitude;
+	    case ENGAGED:
+		if ((lastHoldState != ENGAGED) || (lastHoldAltitude != currentHoldAltitude))
+		{
+		    lastHoldState = ENGAGED;
+		    lastHoldAltitude = currentHoldAltitude;
 
-                if (eepromConfig.metricUnits)
-			    {
-				    if (abs(currentHoldAltitude)<100)
-				    {
-					    snprintf(buf,7,"\012%c%1d.%1dm", currentHoldAltitude < 0 ? '-' : ' ',abs(currentHoldAltitude/10),abs(currentHoldAltitude%10));
-					}
-					else
-					{
-					    snprintf(buf,7,"\012%4dm",currentHoldAltitude/10);
-					}
-				}
-				else
+		    if (eepromConfig.metricUnits)
 				{
-					snprintf(buf,7,"\12%4df",currentHoldAltitude);
-				}
+					if (abs(currentHoldAltitude)<100)
+					{
+						snprintf(buf,7,"\012%c%1d.%1dm", currentHoldAltitude < 0 ? '-' : ' ',abs(currentHoldAltitude/10),abs(currentHoldAltitude%10));
+					    }
+					    else
+					    {
+						snprintf(buf,7,"\012%4dm",currentHoldAltitude/10);
+					    }
+				    }
+				    else
+				    {
+					    snprintf(buf,7,"\12%4df",currentHoldAltitude);
+				    }
 
-				isWriteNeeded = true;
-            }
-            break;
+				    isWriteNeeded = true;
+		}
+		break;
 
-        case PANIC:
-            if (lastHoldState != PANIC)
-            {
-                lastHoldState = PANIC;
-                snprintf(buf,7,"\12panic");
-                isWriteNeeded = true;
-            }
-            break;
+	    case PANIC:
+		if (lastHoldState != PANIC)
+		{
+		    lastHoldState = PANIC;
+		    snprintf(buf,7,"\12panic");
+		    isWriteNeeded = true;
+		}
+		break;
+	}
     }
 
     if (isWriteNeeded)
-        writeMax7456Chars(buf, 6, 0, ALTITUDE_ROW, ALTITUDE_COL+6);
+        writeMax7456Chars(buf, 6, 0, eepromConfig.osdDisplayAltRow, eepromConfig.osdDisplayAltCol+6);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -302,9 +302,6 @@ void displayAttitude(float roll, float pitch, uint8_t flightMode)
 // Heading Display
 ///////////////////////////////////////////////////////////////////////////////
 
-#define COMPASS_ROW 1
-#define COMPASS_COL 13
-
 int16_t lastOSDheading = 361; // bogus value to force update
 
 void displayHeading(float currentHeading)
@@ -318,12 +315,10 @@ void displayHeading(float currentHeading)
     {
     	snprintf(buf ,6, "\026%3d\027", currentHeadingDeg); // \026 is compass \027 is degree symbol
 
-    	writeMax7456Chars(buf, 5, 0, COMPASS_ROW, COMPASS_COL);
+    	writeMax7456Chars(buf, 5, 0, eepromConfig.osdDisplayHdgRow, eepromConfig.osdDisplayHdgCol);
 
         lastOSDheading = currentHeadingDeg;
     }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-
-

@@ -77,12 +77,12 @@ static void cycleCounterInit(void)
 
 uint16_t frameCounter = 0;
 
-uint8_t frame_500Hz = false;
-uint8_t frame_100Hz = false;
-uint8_t frame_50Hz  = false;
-uint8_t frame_10Hz  = false;
-uint8_t frame_5Hz   = false;
-uint8_t frame_1Hz   = false;
+semaphore_t frame_500Hz = false;
+semaphore_t frame_100Hz = false;
+semaphore_t frame_50Hz  = false;
+semaphore_t frame_10Hz  = false;
+semaphore_t frame_5Hz   = false;
+semaphore_t frame_1Hz   = false;
 
 uint32_t deltaTime1000Hz, executionTime1000Hz, previous1000HzTime;
 uint32_t deltaTime500Hz,  executionTime500Hz,  previous500HzTime;
@@ -94,9 +94,15 @@ uint32_t deltaTime1Hz,    executionTime1Hz,    previous1HzTime;
 
 float dt500Hz, dt100Hz;
 
-uint8_t systemReady = false;
+semaphore_t systemReady = false;
 
-uint8_t execUp = false;
+semaphore_t execUp = false;
+
+#ifdef _DTIMING
+	#define LA2_ENABLE       GPIO_SetBits(GPIOC,   GPIO_Pin_2)
+	#define LA2_DISABLE      GPIO_ResetBits(GPIOC, GPIO_Pin_2)
+#endif
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // SysTick
@@ -106,17 +112,25 @@ void SysTick_Handler(void)
 {
     uint8_t index;
     uint32_t currentTime;
+    float mxrTemp[3];
 
     sysTickCycleCounter = *DWT_CYCCNT;
     sysTickUptime++;
 
+    watchDogsTick();
+
     if ((systemReady         == true)  &&
         (cliBusy             == false) &&
+        (accelCalibrating    == false) &&
         (escCalibrating      == false) &&
         (magCalibrating      == false) &&
         (mpu6000Calibrating  == false))
 
     {
+        #ifdef _DTIMING
+//    	    LA2_ENABLE;
+        #endif
+
         frameCounter++;
         if (frameCounter > FRAME_COUNT)
             frameCounter = 1;
@@ -141,6 +155,18 @@ void SysTick_Handler(void)
         gyroSum500Hz[PITCH] += rawGyro[PITCH].value;
         gyroSum500Hz[YAW  ] += rawGyro[YAW  ].value;
 
+        mxrTemp[XAXIS] = mxr9150XAxis();
+        mxrTemp[YAXIS] = mxr9150YAxis();
+        mxrTemp[ZAXIS] = mxr9150ZAxis();
+
+        accelSum500HzMXR[XAXIS] += mxrTemp[XAXIS];
+		accelSum500HzMXR[YAXIS] += mxrTemp[YAXIS];
+		accelSum500HzMXR[ZAXIS] += mxrTemp[ZAXIS];
+
+		accelSum100HzMXR[XAXIS] += mxrTemp[XAXIS];
+		accelSum100HzMXR[YAXIS] += mxrTemp[YAXIS];
+		accelSum100HzMXR[ZAXIS] += mxrTemp[ZAXIS];
+
         ///////////////////////////////
 
         if ((frameCounter % COUNT_500HZ) == 0)
@@ -150,10 +176,13 @@ void SysTick_Handler(void)
             for (index = 0; index < 3; index++)
             {
             	accelSummedSamples500Hz[index] = accelSum500Hz[index];
-            	accelSum500Hz[index] = 0.0f;
+            	accelSum500Hz[index] = 0;
+
+            	accelSummedSamples500HzMXR[index] = accelSum500HzMXR[index];
+            	accelSum500HzMXR[index] = 0.0f;
 
             	gyroSummedSamples500Hz[index] = gyroSum500Hz[index];
-                gyroSum500Hz[index] = 0.0f;
+                gyroSum500Hz[index] = 0;
             }
         }
 
@@ -166,23 +195,25 @@ void SysTick_Handler(void)
             for (index = 0; index < 3; index++)
             {
                 accelSummedSamples100Hz[index] = accelSum100Hz[index];
-                accelSum100Hz[index] = 0.0f;
+                accelSum100Hz[index] = 0;
+
+                accelSummedSamples100HzMXR[index] = accelSum100HzMXR[index];
+                accelSum100HzMXR[index] = 0.0f;
             }
 
-            if (frameCounter == COUNT_100HZ)
-            {
-                readTemperatureRequestPressure(MS5611_I2C);
-            }
-            else if (frameCounter == FRAME_COUNT)
-            {
-                readPressureRequestTemperature(MS5611_I2C);
-            }
-            else
-            {
-                readPressureRequestPressure(MS5611_I2C);
-            }
+            if (!newTemperatureReading)
+			{
+				readTemperatureRequestPressure(MS5611_I2C);
+			    newTemperatureReading = true;
+			}
+			else
+			{
+			    readPressureRequestTemperature(MS5611_I2C);
+			    newPressureReading = true;
+			}
 
-            d1Sum += d1.value;
+            disk_timerproc();
+
         }
 
         ///////////////////////////////
@@ -213,21 +244,34 @@ void SysTick_Handler(void)
         executionTime1000Hz = micros() - currentTime;
 
         ///////////////////////////////
+
+        #ifdef _DTIMING
+//            LA2_DISABLE;
+        #endif
     }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // System Time in Microseconds
+//
+// Note: This can be called from within IRQ Handlers, so uses LDREX/STREX.
+// If a higher priority IRQ or DMA or anything happens the STREX will fail
+// and restart the loop. Otherwise the same number that was read is harmlessly
+// written back.
 ///////////////////////////////////////////////////////////////////////////////
 
 uint32_t micros(void)
 {
     register uint32_t oldCycle, cycle, timeMs;
-    __disable_irq();
-    cycle = *DWT_CYCCNT;
-    oldCycle = sysTickCycleCounter;
-    timeMs = sysTickUptime;
-    __enable_irq();
+
+    do
+    {
+        timeMs = __LDREXW(&sysTickUptime);
+        cycle = *DWT_CYCCNT;
+        oldCycle = sysTickCycleCounter;
+    }
+    while ( __STREXW( timeMs , &sysTickUptime ) );
+
     return (timeMs * 1000) + (cycle - oldCycle) / usTicks;
 }
 
@@ -244,6 +288,17 @@ uint32_t millis(void)
 // System Initialization
 ///////////////////////////////////////////////////////////////////////////////
 
+void checkResetType()
+{
+    uint32_t rst = RCC->CSR;
+
+    evrPush(( rst & (RCC_CSR_PORRSTF | RCC_CSR_PADRSTF | RCC_CSR_SFTRSTF) ) ? EVR_NormalReset : EVR_AbnormalReset , rst >> 24 );
+
+    RCC_ClearFlag();
+}
+
+///////////////////////////////////////
+
 void systemInit(void)
 {
 	// Init cycle counter
@@ -251,6 +306,8 @@ void systemInit(void)
 
     // SysTick
     SysTick_Config(SystemCoreClock / 1000);
+
+    checkResetType();
 
     checkFirstTime(false);
 	readEEPROM();
@@ -268,6 +325,7 @@ void systemInit(void)
     BLUE_LED_ON;
 
     adcInit();
+    batteryInit();
     gpsInit();
     i2cInit(I2C1);
     i2cInit(I2C2);
@@ -292,6 +350,9 @@ void systemInit(void)
     initPressure(MS5611_I2C);
 
     initMax7456();
+
+    initFirstOrderFilter();
+    logInit();
 
     initPID();
 }

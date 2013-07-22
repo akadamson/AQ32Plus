@@ -42,8 +42,8 @@
 
 void max7456CLI()
 {
-    uint8_t  max7456query;
-    uint8_t  validQuery = false;
+    uint8_t  max7456query = 'x' ;
+    uint8_t  validQuery   = false;
 
     cliBusy = true;
 
@@ -67,94 +67,137 @@ void max7456CLI()
             ///////////////////////
 
             case 'a': // OSD Configuration
-                cliPrint("\nMAX7456 OSD Status:             ");
+                cliPrint("\nMAX7456 OSD Status:              ");
                 if (eepromConfig.osdEnabled)
                 	cliPrint("Enabled\n");
                 else
                	    cliPrint("Disabled\n");
 
-                cliPrint("OSD Default Video Standard:     ");
+                cliPrint("OSD Default Video Standard:      ");
                 if (eepromConfig.defaultVideoStandard)
                     cliPrint("PAL\n");
                 else
                     cliPrint("NTSC\n");
 
-                cliPrint("OSD Display Units:              ");
+                cliPrint("OSD Display Units:               ");
                 if (eepromConfig.metricUnits)
                     cliPrint("Metric\n");
                 else
                     cliPrint("English\n");
 
-                cliPrint("OSD Altitude Display:           ");
+                cliPrint("OSD Altitude Display:            ");
                 if (eepromConfig.osdDisplayAlt)
-                    cliPrint("On\n");
+                    cliPrint(" On\n");
                 else
                     cliPrint("Off\n");
 
-                cliPrint("OSD Artifical Horizon Display:  ");
+				cliPrintF("OSD Altitude Row:                %3d\n", eepromConfig.osdDisplayAltRow);
+				cliPrintF("OSD Altitude Column:             %3d\n", eepromConfig.osdDisplayAltCol);
+
+				cliPrint("OSD Altitude Hold State Display: ");
+                if (eepromConfig.osdDisplayAltHoldState)
+                    cliPrint(" On\n");
+                else
+                    cliPrint("Off\n");
+
+                cliPrint("OSD Artificial Horizon Display:  ");
                 if (eepromConfig.osdDisplayAH)
-                    cliPrint("On\n");
+                    cliPrint(" On\n");
                 else
                     cliPrint("Off\n");
 
-                cliPrint("OSD Attitude Display:           ");
+                cliPrint("OSD Attitude Display:            ");
                 if (eepromConfig.osdDisplayAtt)
-                    cliPrint("On\n");
+                    cliPrint(" On\n");
                 else
                     cliPrint("Off\n");
 
-                cliPrint("OSD Heading Display:            ");
+                cliPrint("OSD Heading Display:             ");
                 if (eepromConfig.osdDisplayHdg)
-                    cliPrint("On\n");
+                    cliPrint(" On\n");
                 else
                     cliPrint("Off\n");
 
-                cliPrint("\n");
+				cliPrintF("OSD Heading Row:                 %3d\n", eepromConfig.osdDisplayHdgRow);
+				cliPrintF("OSD Heading Column:              %3d\n", eepromConfig.osdDisplayHdgCol);
+
+				cliPrint("\n");
                 validQuery = false;
                 break;
 
             ///////////////////////
 
-            case 'b': // Enable OSD Altitude Display
-                eepromConfig.osdDisplayAlt  = true;
+   		    case 'b': // Toggle OSD Altitude Display
+   			    if (eepromConfig.osdDisplayAlt)
+   			        eepromConfig.osdDisplayAlt = false;
+   			    else
+   			        eepromConfig.osdDisplayAlt = true;
 
                 max7456query = 'a';
                 validQuery = true;
-                break;
+   				break;
 
-            ///////////////////////
+			///////////////////////
 
-            case 'c': // Enable OSD Artifical Horizon Display
-                eepromConfig.osdDisplayAH  = true;
-                eepromConfig.osdDisplayAtt = false;
-
-                max7456query = 'a';
-                validQuery = true;
-                break;
-
-            ///////////////////////
-
-            case 'd': // Enable OSD Attitude Display
-                eepromConfig.osdDisplayAtt = true;
-                eepromConfig.osdDisplayAH  = false;
+			case 'c': // Toggle OSD Altitude State Display
+   			    if (eepromConfig.osdDisplayAltHoldState)
+   			        eepromConfig.osdDisplayAltHoldState = false;
+   			    else
+   			        eepromConfig.osdDisplayAltHoldState = true;
 
                 max7456query = 'a';
                 validQuery = true;
-                break;
+   				break;
 
-            ///////////////////////
+			///////////////////////
 
-            case 'e': // Enable OSD Heading Display
-                eepromConfig.osdDisplayHdg = true;
+			case 'd': // Toggle OSD Artificial Horizon Display
+   			    if (eepromConfig.osdDisplayAH)
+   			        eepromConfig.osdDisplayAH = false;
+   			    else
+   			    {
+   			        eepromConfig.osdDisplayAH  = true;
+   			        eepromConfig.osdDisplayAtt = false;
+   			    }
 
                 max7456query = 'a';
                 validQuery = true;
-                break;
+   				break;
+
+			///////////////////////
+
+           case 'e': // Toggle OSD Attitude Horizon Display
+   			    if (eepromConfig.osdDisplayAtt)
+   			        eepromConfig.osdDisplayAtt = false;
+   			    else
+   			    {
+   			        eepromConfig.osdDisplayAtt = true;
+   			        eepromConfig.osdDisplayAH  = false;
+   			    }
+
+                max7456query = 'a';
+                validQuery = true;
+   				break;
+
+			///////////////////////
+
+             case 'f': // Toggle OSD Heading Display
+   			    if (eepromConfig.osdDisplayHdg)
+   			        eepromConfig.osdDisplayHdg = false;
+   			    else
+   			        eepromConfig.osdDisplayHdg = true;
+
+                max7456query = 'a';
+                validQuery = true;
+   				break;
 
             ///////////////////////
 
-            case 'q': // Set English Display Units
-                eepromConfig.metricUnits = false;
+            case 'q': // Toggle English/Metric Display Units
+                if (eepromConfig.metricUnits)
+                	eepromConfig.metricUnits = false;
+                else
+                    eepromConfig.metricUnits = true;
 
                 max7456query = 'a';
                 validQuery = true;
@@ -217,8 +260,21 @@ void max7456CLI()
 
             ///////////////////////
 
-            case 'B': // Disable OSD Altitude Display
-                eepromConfig.osdDisplayAlt = false;
+			case 'B': // Change OSD Altitude Display Location
+                eepromConfig.osdDisplayAltRow = readFloatCLI();
+				eepromConfig.osdDisplayAltCol = readFloatCLI();
+
+				max7456query = 'a';
+				validQuery = true;
+				break;
+
+			///////////////////////
+
+			case 'C': // Disable OSD Altitude State Display
+				if (eepromConfig.osdDisplayAltHoldState)
+					eepromConfig.osdDisplayAltHoldState = false;
+				else
+					eepromConfig.osdDisplayAltHoldState = true;
 
                 max7456query = 'a';
                 validQuery = true;
@@ -226,41 +282,15 @@ void max7456CLI()
 
             ///////////////////////
 
-            case 'C': // Disable OSD Artifical Horizon Display
-                eepromConfig.osdDisplayAH = false;
+            case 'F': // Change OSD Heading Display Location
+                eepromConfig.osdDisplayHdgRow = readFloatCLI();
+				eepromConfig.osdDisplayHdgCol = readFloatCLI();
 
-                max7456query = 'a';
-                validQuery = true;
-                break;
-
-            ///////////////////////
-
-            case 'D': // Disable OSD Attitude Display
-                eepromConfig.osdDisplayAtt = false;
-
-                max7456query = 'a';
-                validQuery = true;
-                break;
+				max7456query = 'a';
+				validQuery = true;
+				break;
 
             ///////////////////////
-
-            case 'E': // Disable OSD Heading Display
-                eepromConfig.osdDisplayHdg = false;
-
-                max7456query = 'a';
-                validQuery = true;
-                break;
-
-           ///////////////////////
-
-           case 'Q': // Set Metric Display Units
-                eepromConfig.metricUnits = true;
-
-                max7456query = 'a';
-                validQuery = true;
-                break;
-
-            ///////////////////////////
 
             case 'W': // Write EEPROM Parameters
                 cliPrint("\nWriting EEPROM Parameters....\n\n");
@@ -272,17 +302,18 @@ void max7456CLI()
 			case '?':
 			   	cliPrint("\n");
 			   	cliPrint("'a' OSD Configuration\n");
-			    cliPrint("'b' Enable OSD Altitude Display            'B' Disable OSD Altitude Display\n");
-			   	cliPrint("'c' Enable OSD Artificial Horizon Display  'C' Disable OSD Artificial Horizon Display\n");
-			   	cliPrint("'d' Enable OSD Attitude Display            'D' Disable OSD Attitude Display\n");
-			   	cliPrint("'e' Enable OSD Heading Display             'E' Disable OSD Heading Display\n");
-			   	cliPrint("'q' Set English Display Units              'Q' Set Metric Display Units\n");
-			    cliPrint("'r' Reset MAX7456\n");
+				cliPrint("'b' Toggle OSD Alt Display                 'B' Change OSD Alt Display Location              Brow;column\n");
+				cliPrint("'c' Toggle OSD Alt Hold State Display      'C' Change OSD Alt Hold State Display Location   Crow;column\n");
+			   	cliPrint("'d' Toggle OSD Artificial Horizon Display\n");
+			   	cliPrint("'e' Toggle OSD Attitude Display\n");
+			   	cliPrint("'f' Toggle OSD Heading Display             'F' Change OSD Heading Display Location          Frow;column\n");
+				cliPrint("'q' Toggle English/Metric Display Units\n");
+				cliPrint("'r' Reset MAX7456\n");
 			   	cliPrint("'s' Display MAX7456 Character Set\n");
 			   	cliPrint("'t' Download Font to MAX7456\n");
 			   	cliPrint("'u' Toggle OSD Enabled State\n");
 			   	cliPrint("'v' Toggle Default Video Standard          'W' Write EEPROM Parameters\n");
-			   	cliPrint("'x' Exit Sensor CLI                        '?' Command Summary\n");
+			   	cliPrint("'x' Exit MAX7456 CLI                       '?' Command Summary\n");
 			   	cliPrint("\n");
 	    	    break;
 
@@ -302,7 +333,7 @@ void mixerCLI()
     uint8_t  index;
     uint8_t  rows, columns;
 
-    uint8_t  mixerQuery;
+    uint8_t  mixerQuery = 'x';
     uint8_t  validQuery = false;
 
     cliBusy = true;
@@ -704,8 +735,8 @@ void receiverCLI()
     char     rcOrderString[9];
     float    tempFloat;
     uint8_t  index;
-    uint8_t  receiverQuery;
-    uint8_t  validQuery = false;
+    uint8_t  receiverQuery = 'x';
+    uint8_t  validQuery    = false;
 
     cliBusy = true;
 
@@ -823,6 +854,19 @@ void receiverCLI()
             case 'C': // Read Spektrum Resolution
                 eepromConfig.spektrumHires = (uint8_t)readFloatCLI();
 
+                if (eepromConfig.spektrumHires)
+                {
+        		    // 11 bit frames
+        		    spektrumChannelShift = 3;
+        		    spektrumChannelMask  = 0x07;
+        		}
+        		else
+        		{
+        		    // 10 bit frames
+        		    spektrumChannelShift = 2;
+        		    spektrumChannelMask  = 0x03;
+        		}
+
                 receiverQuery = 'a';
                 validQuery = true;
                 break;
@@ -893,7 +937,7 @@ void receiverCLI()
 
 void sensorCLI()
 {
-    uint8_t  sensorQuery;
+    uint8_t  sensorQuery = 'x';
     uint8_t  tempInt;
     uint8_t  validQuery = false;
 
@@ -917,7 +961,13 @@ void sensorCLI()
             ///////////////////////////
 
             case 'a': // Sensor Data
-                cliPrintF("\nAccel Temp Comp Slope:     %9.4f, %9.4f, %9.4f\n", eepromConfig.accelTCBiasSlope[XAXIS],
+                cliPrintF("\nMXR Accel Bias:            %9.4f, %9.4f, %9.4f\n", eepromConfig.accelBiasMXR[XAXIS],
+				                                                		        eepromConfig.accelBiasMXR[YAXIS],
+				                                                		        eepromConfig.accelBiasMXR[ZAXIS]);
+				cliPrintF("MXR Accel Scale Factor:    %9.4f, %9.4f, %9.4f\n",   eepromConfig.accelScaleFactorMXR[XAXIS],
+								                                                eepromConfig.accelScaleFactorMXR[YAXIS],
+				                                                		        eepromConfig.accelScaleFactorMXR[ZAXIS]);
+               cliPrintF("Accel Temp Comp Slope:     %9.4f, %9.4f, %9.4f\n",    eepromConfig.accelTCBiasSlope[XAXIS],
                                                 		                        eepromConfig.accelTCBiasSlope[YAXIS],
                                                 		                        eepromConfig.accelTCBiasSlope[ZAXIS]);
                 cliPrintF("Accel Temp Comp Bias:      %9.4f, %9.4f, %9.4f\n",   eepromConfig.accelTCBiasIntercept[XAXIS],
@@ -929,9 +979,6 @@ void sensorCLI()
                 cliPrintF("Gyro Temp Comp Intercept:  %9.4f, %9.4f, %9.4f\n",   eepromConfig.gyroTCBiasIntercept[ROLL ],
                                                                    		        eepromConfig.gyroTCBiasIntercept[PITCH],
                                                                    		        eepromConfig.gyroTCBiasIntercept[YAW  ]);
-                cliPrintF("Gyro TC Bias Intercept:    %9.4f, %9.4f, %9.4f\n",   eepromConfig.gyroTCBiasIntercept[ROLL ],
-                   		                                                        eepromConfig.gyroTCBiasIntercept[PITCH],
-                   		                                                        eepromConfig.gyroTCBiasIntercept[YAW  ]);
                 cliPrintF("Mag Bias:                  %9.4f, %9.4f, %9.4f\n",   eepromConfig.magBias[XAXIS],
                                                    		                        eepromConfig.magBias[YAXIS],
                                                    		                        eepromConfig.magBias[ZAXIS]);
@@ -963,11 +1010,11 @@ void sensorCLI()
 
                 cliPrint("Magnetic Variation:           ");
                 if (eepromConfig.magVar >= 0.0f)
-                  cliPrintF("E%6.4f\n",  eepromConfig.magVar * R2D);
+                  cliPrintF("E%6.4f\n\n",  eepromConfig.magVar * R2D);
                 else
-                  cliPrintF("W%6.4f\n", -eepromConfig.magVar * R2D);
+                  cliPrintF("W%6.4f\n\n", -eepromConfig.magVar * R2D);
 
-                cliPrintF("Battery Voltage Divider:   %9.4f\n\n", eepromConfig.batteryVoltageDivider);
+                cliPrintF("Battery Cells:               %2d\n", eepromConfig.batteryCells);
 
                 validQuery = false;
                 break;
@@ -985,6 +1032,15 @@ void sensorCLI()
 
             case 'c': // Magnetometer Calibration
                 magCalibration(HMC5883L_I2C);
+
+                sensorQuery = 'a';
+                validQuery = true;
+                break;
+
+            ///////////////////////////
+
+            case 'd': // Accel Bias and Scale Factor Calibration
+                accelCalibration();
 
                 sensorQuery = 'a';
                 validQuery = true;
@@ -1074,7 +1130,7 @@ void sensorCLI()
                 validQuery = true;
                 break;
 
-            ///////////////////////////
+    	    ///////////////////////////
 
             case 'M': // Magnetic Variation
                 eepromConfig.magVar = readFloatCLI() * D2R;
@@ -1085,8 +1141,10 @@ void sensorCLI()
 
             ///////////////////////////
 
-            case 'V': // Set Battery Voltage Divider
-                eepromConfig.batteryVoltageDivider = readFloatCLI();
+            case 'V': // Set Battery monitoring configuration
+                eepromConfig.voltageMonitorScale = readFloatCLI();
+                eepromConfig.voltageMonitorBias  = readFloatCLI();
+                eepromConfig.batteryCells  = readFloatCLI();
 
                 sensorQuery = 'a';
                 validQuery = true;
@@ -1104,15 +1162,14 @@ void sensorCLI()
 			case '?':
 			   	cliPrint("\n");
 			   	cliPrint("'a' Display Sensor Data                    'A' Set MPU6000 DLPF                     A0 thru 3, see aq32Plus.h\n");
-			   	cliPrint("'b' MPU6000 Calibration                    'B' Set Accel Cutoff                     BAccelCutoff\n");
+			   	cliPrint("'b' MPU6000 Temp Calibration               'B' Set Accel Cutoff                     BAccelCutoff\n");
 			   	cliPrint("'c' Magnetometer Calibration               'C' Set kpAcc/kiAcc                      CkpAcc;kiAcc\n");
-			   	cliPrint("                                           'D' Set kpMag/kiMag                      DkpMag;kiMag\n");
+			   	cliPrint("'d' Accel Bias and SF Calibration          'D' Set kpMag/kiMag                      DkpMag;kiMag\n");
 			   	cliPrint("                                           'E' Set h dot est/h est Comp Filter A/B  EA;B\n");
 			   	cliPrint("                                           'M' Set Mag Variation (+ East, - West)   MMagVar\n");
-			   	cliPrint("                                           'V' Set Battery Voltage Divider          VbatVoltDivider\n");
+			   	cliPrint("                                           'V' Set Battery Voltage Config           VVPin;VScale;VBias;#Cells\n");
 			   	cliPrint("                                           'W' Write EEPROM Parameters\n");
 			   	cliPrint("'x' Exit Sensor CLI                        '?' Command Summary\n");
-			    cliPrint("\n");
 	    	    break;
 
 	    	///////////////////////////
@@ -1129,7 +1186,7 @@ void gpsCLI()
 {
 	USART_InitTypeDef USART_InitStructure;
 
-	uint8_t  gpsQuery;
+	uint8_t  gpsQuery   = 'x';
     uint8_t  validQuery = false;
 
     cliBusy = true;
@@ -1277,6 +1334,289 @@ void gpsCLI()
 	    	///////////////////////////
 	    }
 	}
+
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// EEPROM CLI
+///////////////////////////////////////////////////////////////////////////////
+
+int min(int a, int b)
+{
+    return a < b ? a : b;
+}
+
+///////////////////////////////////////
+
+int8_t parse_hex(char c)
+{
+    if ('0' <= c && c <= '9')
+        return c - '0';
+    if ('a' <= c && c <= 'f')
+        return c - 'a' + 0x0A;
+    if ('A' <= c && c <= 'F')
+        return c - 'A' + 0x0A;
+    return -1;
+}
+
+///////////////////////////////////////
+
+void cliPrintEEPROM(eepromConfig_t *e)
+{
+    uint32_t old_crc = e->CRCAtEnd[0];
+    enum { line_length = 32, len = sizeof(eepromConfig_t) };
+    uint8_t *by = (uint8_t*)e;
+    int i, j;
+
+    e->CRCAtEnd[0] = crc32bEEPROM(e, false);
+
+    if (e->CRCFlags & CRC_HistoryBad)
+      evrPush(EVR_ConfigBadHistory, 0);
+
+    for (i = 0; i < ceil((float)len / line_length); i++)
+    {
+        for (j = 0; j < min(line_length, len - line_length * i); j++)
+            cliPrintF("%02X", by[i * line_length + j]);
+
+        cliPrint("\n");
+    }
+
+    e->CRCAtEnd[0] = old_crc;
+}
+
+///////////////////////////////////////
+
+void eepromCLI()
+{
+    uint8_t  eepromQuery;
+    uint8_t  validQuery = false;
+
+    cliBusy = true;
+
+    cliPrint("\nEntering EEPROM CLI....\n\n");
+
+    while(true)
+    {
+        cliPrint("EEPROM CLI -> ");
+
+        while ((cliAvailable() == false) && (validQuery == false));
+
+        if (validQuery == false)
+            eepromQuery = cliRead();
+
+        cliPrint("\n");
+
+        switch(eepromQuery)
+        {
+            // 'a' is the standard "print all the information" character
+            case 'a': // config struct data
+                ;
+                uint32_t c1 = eepromConfig.CRCAtEnd[0],
+                         c2 = crc32bEEPROM(&eepromConfig, false);
+
+                cliPrintF("Config structure information:\n");
+                cliPrintF("Version          : %d\n", eepromConfig.version );
+                cliPrintF("Size             : %d\n", sizeof(eepromConfig) );
+                cliPrintF("CRC on last read : %08x\n", c1 );
+                cliPrintF("Current CRC      : %08x\n", c2 );
+                if ( c1 != c2 )
+                    cliPrintF("  CRCs differ. Current Config has not yet been saved.\n");
+                cliPrintF("CRC Flags :\n");
+                cliPrintF("  History Bad    : %s\n", eepromConfig.CRCFlags & CRC_HistoryBad ? "true" : "false" );
+                validQuery = false;
+                break;
+
+            ///////////////////////////
+
+            case 'c': // Write out to Console in Hex.  (RAM -> console)
+                // we assume the flyer is not in the air, so that this is ok;
+                // these change randomly when not in flight and can mistakenly
+                // make one think that the in-memory eeprom struct has changed
+                zeroPIDintegralError();
+                zeroPIDstates();
+
+                cliPrintF("\n");
+
+                cliPrintEEPROM(&eepromConfig);
+
+                cliPrintF("\n");
+
+                if (crcCheckVal != crc32bEEPROM(&eepromConfig, true))
+                {
+                    cliPrint("NOTE: in-memory config CRC invalid; there have probably been changes to\n");
+                    cliPrint("      eepromConfig since the last write to flash/eeprom.\n");
+                }
+
+                validQuery = false;
+                break;
+
+            ///////////////////////////
+
+            case 'H': // clear bad history flag
+                cliPrintF("Clearing Bad History flag.\n");
+                eepromConfig.CRCFlags &= ~CRC_HistoryBad;
+                validQuery = false;
+                break;
+
+            ///////////////////////////
+
+            case 'C': // Read in from Console in hex.  Console -> RAM
+                ;
+                uint32_t sz = sizeof(eepromConfig);
+                eepromConfig_t e;
+                uint8_t *p = (uint8_t*)&e;
+                uint8_t *end = (uint8_t*)(&e + 1);
+                uint32_t t = millis();
+                enum { Timeout = 100 }; // timeout is in ms
+                int second_nibble = 0; // 0 or 1
+                char c;
+                uint32_t chars_encountered = 0;
+
+                cliPrintF("Ready to read in config. Expecting %d (0x%03X) bytes as %d\n",
+                    sz, sz, sz * 2);
+                cliPrintF("hexadecimal characters, optionally separated by [ \\n\\r_].\n");
+                cliPrintF("Times out if no character is received for %dms\n", Timeout);
+
+                memset(p, 0, end - p);
+
+                while (p < end)
+                {
+                    while (!cliAvailable() && millis() - t < Timeout) {}
+                    t = millis();
+
+                    c = cliAvailable() ? cliRead() : '\0';
+                    int8_t hex = parse_hex(c);
+                    int ignore = c == ' ' || c == '\n' || c == '\r' || c == '_' ? true : false;
+
+                    if (c != '\0') // assume the person isn't sending null chars
+                        chars_encountered++;
+                    if (ignore)
+                        continue;
+                    if (hex == -1)
+                        break;
+
+                    *p |= second_nibble ? hex : hex << 4;
+                    p += second_nibble;
+                    second_nibble ^= 1;
+                }
+
+                if (c == 0)
+                {
+                    cliPrintF("Did not receive enough hex chars! (got %d, expected %d)\n",
+                        (p - (uint8_t*)&e) * 2 + second_nibble, sz * 2);
+                }
+                else if (p < end || second_nibble)
+                {
+                    cliPrintF("Invalid character found at position %d: '%c' (0x%02x)",
+                        chars_encountered, c, c);
+                }
+                else if (crcCheckVal != crc32bEEPROM(&e, true))
+                {
+                    cliPrintF("CRC mismatch! Not writing to in-memory config.\n");
+                    cliPrintF("Here's what was received:\n\n");
+                    cliPrintEEPROM(&e);
+                }
+                else
+                {
+                    // check to see if the newly received eeprom config
+                    // actually differs from what's in-memory
+                    zeroPIDintegralError();
+                    zeroPIDstates();
+
+                    int i;
+                    for (i = 0; i < sz; i++)
+                        if (((uint8_t*)&e)[i] != ((uint8_t*)&eepromConfig)[i])
+                            break;
+
+                    if (i == sz)
+                    {
+                        cliPrintF("NOTE: uploaded config was identical to in-memory config.\n");
+                    }
+                    else
+                    {
+                        eepromConfig = e;
+                        cliPrintF("In-memory config updated!\n");
+                        cliPrintF("NOTE: config not written to EEPROM; use 'W' to do so.\n");
+                    }
+
+                }
+
+                // eat the next 100ms (or whatever Timeout is) of characters,
+                // in case the person pasted too much by mistake or something
+                t = millis();
+                while (millis() - t < Timeout)
+                    if (cliAvailable())
+                        cliRead();
+
+                validQuery = false;
+                break;
+
+            ///////////////////////////
+
+            case 'E': // Read in from EEPROM.  (EEPROM -> RAM)
+                cliPrint("Re-reading EEPROM.\n");
+                readEEPROM();
+                validQuery = false;
+                break;
+
+            ///////////////////////////
+
+            case 'x': // exit EEPROM CLI
+                cliPrint("\nExiting EEPROM CLI....\n\n");
+                cliBusy = false;
+                return;
+                break;
+
+            ///////////////////////////
+
+            case 'W':
+            case 'e': // Write out to EEPROM. (RAM -> EEPROM)
+                cliPrint("\nWriting EEPROM Parameters....\n\n");
+                writeEEPROM();
+                break;
+
+            ///////////////////////////
+
+            case 'f': // Write out to sdCard FILE. (RAM -> FILE)
+                validQuery = false;
+                break;
+
+            ///////////////////////////
+
+            case 'F': // Read in from sdCard FILE. (FILE -> RAM)
+                validQuery = false;
+                break;
+
+            ///////////////////////////
+
+            case 'V': // Reset EEPROM Parameters
+                cliPrint( "\nEEPROM Parameters Reset....(not rebooting)\n" );
+                checkFirstTime(true);
+                validQuery = false;
+            break;
+
+
+            ///////////////////////////
+
+            case '?':
+            //                0         1         2         3         4         5         6         7
+            //                01234567890123456789012345678901234567890123456789012345678901234567890123456789
+                cliPrintF("\n");
+                cliPrintF("'a' Display in-RAM config information\n");
+                cliPrintF("'c' Write in-RAM -> Console (as Hex)      'C' Read Console (as Hex) -> in-RAM\n");
+                cliPrintF("'e' Write in-RAM -> EEPROM                'E' Read EEPROM -> in-RAM\n");
+                cliPrintF("'f' Write in-RAM -> sd FILE (Not yet imp) 'F' Read sd FILE -> in-RAM (Not imp)\n");
+                cliPrintF("                                          'H' Clear CRC Bad History flag\n");
+                cliPrintF("                                          'V' Reset in-RAM config to default.\n");
+                cliPrintF("'x' Exit EEPROM CLI                       '?' Command Summary\n");
+                cliPrintF("\n");
+                cliPrintF("For compatability:                        'W' Write in-RAM -> EEPROM\n");
+                cliPrintF("\n");
+                break;
+
+            ///////////////////////////
+        }
+    }
 
 }
 

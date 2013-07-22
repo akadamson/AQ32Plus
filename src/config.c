@@ -44,7 +44,7 @@ const char rcChannelLetters[] = "AERT1234";
 
 float vTailThrust;
 
-static uint8_t checkNewEEPROMConf = 1;
+static uint8_t checkNewEEPROMConf = 2;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -62,9 +62,28 @@ void parseRcChannels(const char *input)
 
 ///////////////////////////////////////////////////////////////////////////////
 
+uint32_t crc32bEEPROM(eepromConfig_t *e, int includeCRCAtEnd)
+{
+    return crc32B((uint32_t*)e, includeCRCAtEnd ? (uint32_t*)(e + 1) : e->CRCAtEnd);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+enum { eepromConfigNUMWORD =  sizeof(eepromConfig_t)/sizeof(uint32_t) };
+
 void readEEPROM(void)
 {
-    memcpy(&eepromConfig, (char *)FLASH_WRITE_EEPROM_ADDR, sizeof(eepromConfig_t));
+    eepromConfig_t *dst = &eepromConfig;
+
+    *dst = *(eepromConfig_t*)FLASH_WRITE_EEPROM_ADDR ;
+
+    if ( crcCheckVal != crc32bEEPROM(dst, true) )
+    {
+        evrPush(EVR_FlashCRCFail,0);
+        dst->CRCFlags |= CRC_HistoryBad;
+    }
+    else if ( dst->CRCFlags & CRC_HistoryBad )
+      evrPush(EVR_ConfigBadHistory,0);
 
     accConfidenceDecay = 1.0f / sqrt(eepromConfig.accelCutoff);
 
@@ -75,29 +94,43 @@ void readEEPROM(void)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void writeEEPROM(void)
+int writeEEPROM(void)
 {
+    // there's no reason to write these values to EEPROM, they'll just be noise
+    zeroPIDintegralError();
+    zeroPIDstates();
+
     FLASH_Status status;
-    uint32_t i;
+
+    int i;
+    uint32_t       *dst = (uint32_t*)FLASH_WRITE_EEPROM_ADDR;
+    eepromConfig_t *src = &eepromConfig;
+
+    if ( src->CRCFlags & CRC_HistoryBad )
+        evrPush(EVR_ConfigBadHistory,0);
+
+    src->CRCAtEnd[0] = crc32B( (uint32_t*)&src[0], src->CRCAtEnd);
 
     FLASH_Unlock();
 
     FLASH_ClearFlag(FLASH_FLAG_EOP    | FLASH_FLAG_OPERR  | FLASH_FLAG_WRPERR |
                     FLASH_FLAG_PGAERR | FLASH_FLAG_PGPERR | FLASH_FLAG_PGSERR);
 
-    if (FLASH_EraseSector(FLASH_Sector_1, VoltageRange_3) == FLASH_COMPLETE)
-    {
-        for (i = 0; i < sizeof(eepromConfig_t); i += 4)
-        {
-            status = FLASH_ProgramWord(FLASH_WRITE_EEPROM_ADDR + i, *(uint32_t *)((char *)&eepromConfig + i ));
-            if (status != FLASH_COMPLETE)
-                break; // TODO: fail
-        }
-    }
+    i = -1;
+
+    status = FLASH_EraseSector(FLASH_Sector_1, VoltageRange_3);
+
+    while ( FLASH_COMPLETE == status && i++ < eepromConfigNUMWORD )
+        status = FLASH_ProgramWord((uint32_t)&dst[i], ((uint32_t*)src)[i]);
+
+    if ( FLASH_COMPLETE != status )
+        evrPush( -1 == i ? EVR_FlashEraseFail : EVR_FlashProgramFail, status);
 
     FLASH_Lock();
 
     readEEPROM();
+
+    return status;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -114,6 +147,18 @@ void checkFirstTime(bool eepromReset)
         eepromConfig.version = checkNewEEPROMConf;
 
 	    ///////////////////////////////
+
+        eepromConfig.accelBiasMXR[XAXIS]        = 2048.0f;
+        eepromConfig.accelBiasMXR[YAXIS]        = 2048.0f;
+        eepromConfig.accelBiasMXR[ZAXIS]        = 2048.0f;
+
+        ///////////////////////////////
+
+        eepromConfig.accelScaleFactorMXR[XAXIS] = 0.04937965f;  // (3.3 / 4096) / 0.16 * 9.8065
+        eepromConfig.accelScaleFactorMXR[YAXIS] = 0.04937965f;  // (3.3 / 4096) / 0.16 * 9.8065
+        eepromConfig.accelScaleFactorMXR[ZAXIS] = 0.04937965f;  // (3.3 / 4096) / 0.16 * 9.8065
+
+        ///////////////////////////////
 
         eepromConfig.accelTCBiasSlope[XAXIS] = 0.0f;
         eepromConfig.accelTCBiasSlope[YAXIS] = 0.0f;
@@ -156,8 +201,8 @@ void checkFirstTime(bool eepromReset)
 
 	    ///////////////////////////////
 
-	    eepromConfig.compFilterA =  0.005f;
-		eepromConfig.compFilterB =  0.005f;
+	    eepromConfig.compFilterA =  2.0f;
+		eepromConfig.compFilterB =  1.0f;
 
 	    ///////////////////////////////
 
@@ -398,22 +443,32 @@ void checkFirstTime(bool eepromReset)
         eepromConfig.freeMix[5][PITCH]     =  0.0f;
         eepromConfig.freeMix[5][YAW  ]     =  0.0f;
 
-        eepromConfig.osdEnabled            =  false;
-        eepromConfig.defaultVideoStandard  =  NTSC;
-        eepromConfig.metricUnits           =  false;
-        eepromConfig.osdDisplayAlt         =  true;
-        eepromConfig.osdDisplayAH          =  true;
-        eepromConfig.osdDisplayAtt         =  false;
-        eepromConfig.osdDisplayHdg         =  true;
+        eepromConfig.osdEnabled             =  false;
+        eepromConfig.defaultVideoStandard   =  NTSC;
+        eepromConfig.metricUnits            =  false;
 
-        eepromConfig.gpsType               =  NO_GPS;
-        eepromConfig.gpsBaudRate           =  38400;
-        eepromConfig.magVar                =  9.033333f * D2R;  // Albuquerque, NM Mag Var 9 degrees 2 minutes (+East, - West)
+        eepromConfig.osdDisplayAlt          =  true;
+        eepromConfig.osdDisplayAltRow       =  1;
+        eepromConfig.osdDisplayAltCol       =  1;
+        eepromConfig.osdDisplayAltHoldState =  true;
 
-        eepromConfig.batteryVoltageDivider = (10.0f + 1.5f) / 1.5f;
+        eepromConfig.osdDisplayAH           =  true;
+        eepromConfig.osdDisplayAtt          =  false;
 
-        eepromConfig.armCount              = 50;
-        eepromConfig.disarmCount           = 0;
+        eepromConfig.osdDisplayHdg          =  true;
+        eepromConfig.osdDisplayHdgRow       =  1;
+        eepromConfig.osdDisplayHdgCol       =  13;
+
+        eepromConfig.gpsType                =  NO_GPS;
+        eepromConfig.gpsBaudRate            =  38400;
+        eepromConfig.magVar                 =  9.033333f * D2R;  // Albuquerque, NM Mag Var 9 degrees 2 minutes (+ East, - West)
+
+        eepromConfig.batteryCells           = 3;
+        eepromConfig.voltageMonitorScale    = 11.5f / 1.5f;
+        eepromConfig.voltageMonitorBias     = 0.0f;
+
+        eepromConfig.armCount               =  50;
+        eepromConfig.disarmCount            =  0;
 
         writeEEPROM();
 	}

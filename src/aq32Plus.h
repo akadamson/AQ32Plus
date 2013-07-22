@@ -38,18 +38,21 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
-#define     PI 3.14159265f
-#define TWO_PI 6.28318531f
+#ifndef PI
+    #define PI  3.14159265358979f
+#endif
 
-#define D2R (PI / 180.0f)
+#define TWO_PI (2.0f * PI)
 
-#define R2D (180.0f / PI)
+#define D2R  (PI / 180.0f)
+
+#define R2D  (180.0f / PI)
 
 #define KNOTS2MPS 0.51444444f
 
 #define EARTH_RADIUS 6371000f
 
-#define SQR(x)  (x * x)
+#define SQR(x)  ((x) * (x))
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -94,6 +97,10 @@ typedef union {
 	 uint8_t bytes[4];
 } uint32andUint8_t;
 
+///////////////////////////////////////
+
+typedef volatile uint8_t semaphore_t;
+
 ///////////////////////////////////////////////////////////////////////////////
 // Sensor Variables
 ///////////////////////////////////////////////////////////////////////////////
@@ -105,7 +112,10 @@ typedef struct sensors_t
     float    attitude500Hz[3];
     float    gyro500Hz[3];
     float    mag10Hz[3];
-    float    pressureAlt10Hz;
+    float    pressureAlt50Hz;
+
+    float    accel500HzMXR[3];
+    float    accel100HzMXR[3];
 
     float    gpsLatitude;
     float    gpsLongitude;
@@ -237,6 +247,9 @@ typedef struct eepromConfig_t
 
     uint8_t version;
 
+    float accelBiasMXR[3];          // Bias for MXR9150 Accel
+    float accelScaleFactorMXR[3];   // Scale factor for MXR9150 Accel
+
     float accelTCBiasSlope[3];
     float accelTCBiasIntercept[3];
 
@@ -333,13 +346,21 @@ typedef struct eepromConfig_t
 
     ///////////////////////////////////
 
-    uint8_t osdEnabled;            // 0 = Disabled, 1 = Enabled
-    uint8_t defaultVideoStandard;  // 0 = NTSC, 1 = PAL
-    uint8_t metricUnits;           // 1 = metric
-    uint8_t osdDisplayAlt;         // 1 = Display OSD Altitude
-    uint8_t osdDisplayAH;          // 1 = Display OSD Artificial Horizon
-    uint8_t osdDisplayAtt;         // 1 = Display OSD Attitude
-    uint8_t osdDisplayHdg;         // 1 = Display ODS Heading
+    uint8_t osdEnabled;              // 0 = Disabled, 1 = Enabled
+    uint8_t defaultVideoStandard;    // 0 = NTSC, 1 = PAL
+    uint8_t metricUnits;             // 1 = metric
+
+    uint8_t osdDisplayAlt;           // 1 = Display OSD Altitude
+    uint8_t osdDisplayAltRow;
+    uint8_t osdDisplayAltCol;
+    uint8_t osdDisplayAltHoldState;  // 1 = display altitude hold state, 0 = don't display
+
+    uint8_t osdDisplayAH;            // 1 = Display OSD Artificial Horizon
+    uint8_t osdDisplayAtt;           // 1 = Display OSD Attitude
+
+    uint8_t osdDisplayHdg;           // 1 = Display OSD Heading
+    uint8_t osdDisplayHdgRow;
+    uint8_t osdDisplayHdgCol;
 
     ///////////////////////////////////
 
@@ -352,7 +373,9 @@ typedef struct eepromConfig_t
 
     ///////////////////////////////////
 
-    float   batteryVoltageDivider;
+    uint8_t batteryCells;
+    float   voltageMonitorScale;
+    float   voltageMonitorBias;
 
     ///////////////////////////////////
 
@@ -361,7 +384,12 @@ typedef struct eepromConfig_t
 
     ///////////////////////////////////
 
+    uint8_t  CRCFlags;
+    uint32_t CRCAtEnd[1];
+
 } eepromConfig_t;
+
+enum crcFlags { CRC_HistoryBad = 1 };
 
 extern eepromConfig_t eepromConfig;
 

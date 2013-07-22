@@ -40,7 +40,7 @@
 
 uint8_t cliBusy = false;
 
-static volatile uint8_t cliQuery;
+static volatile uint8_t cliQuery        = 'x';
 static volatile uint8_t validCliCommand = false;
 
 uint8_t highSpeedTelem1Enabled = false;
@@ -297,10 +297,13 @@ void cliCom(void)
 
         ///////////////////////////////
 
-        case 'g': // 500 Hz Accels
-        	cliPrintF("%9.4f, %9.4f, %9.4f\n", sensors.accel500Hz[XAXIS],
-        			                           sensors.accel500Hz[YAXIS],
-        			                           sensors.accel500Hz[ZAXIS]);
+        case 'g': // 100 Hz Accels
+        	cliPrintF("%9.4f, %9.4f, %9.4f, %9.4f, %9.4f, %9.4f\n", sensors.accel100Hz[XAXIS],
+        			                                                sensors.accel100Hz[YAXIS],
+        			                                                sensors.accel100Hz[ZAXIS],
+        			                                                sensors.accel100HzMXR[XAXIS],
+        			                                                sensors.accel100HzMXR[YAXIS],
+        			                                                sensors.accel100HzMXR[ZAXIS]);
         	validCliCommand = false;
         	break;
 
@@ -334,10 +337,11 @@ void cliCom(void)
         ///////////////////////////////
 
         case 'k': // Vertical Axis Variables
-        	cliPrintF("%9.4f, %9.4f, %9.4f, %9.4f\n", earthAxisAccels[ZAXIS],
-        			                                  sensors.pressureAlt10Hz,
-        					                          hDotEstimate,
-        					                          hEstimate);
+        	cliPrintF("%9.4f, %9.4f, %9.4f, %9.4f, %4ld\n", earthAxisAccels[ZAXIS],
+        			                                        sensors.pressureAlt50Hz,
+        					                                hDotEstimate,
+        					                                hEstimate,
+        					                                ms5611Temperature);
         	validCliCommand = false;
         	break;
 
@@ -418,12 +422,15 @@ void cliCom(void)
         	else
         	    cliPrint("Heading Hold = DISENGAGED  ");
 
-        	if (altitudeHoldState == DISENGAGED)
-        		cliPrint("Altitude Hold = DISENAGED\n");
-            else if (altitudeHoldState == ENGAGED)
-            	cliPrint("Altitude Hold = ENGAGED\n");
-            else if (altitudeHoldState == PANIC)
-            	cliPrint("Altitude Hold = PANIC\n");
+        	if (altitudeHold == true)
+        	    cliPrint("Alt Hold = ENGAGED     ");
+        	else
+        	    cliPrint("Alt Hold = DISENGAGED  ");
+
+        	if (verticalVelocityHold == true)
+        	    cliPrint("Vert Vel Hold = ENGAGED\n");
+        	else
+        	    cliPrint("Vert Vel Hold = DISENGAGED\n");
 
         	validCliCommand = false;
         	break;
@@ -498,6 +505,7 @@ void cliCom(void)
         ///////////////////////////////
 
         case 'x':
+        	//logSync();
         	validCliCommand = false;
         	break;
 
@@ -512,9 +520,10 @@ void cliCom(void)
         ///////////////////////////////
 
         case 'z':
-            cliPrintF("%5.2f, %4ld, %4ld\n", batteryVoltage(),
-            		                         convertedADC2(),
-            		                         convertedADC4());
+            cliPrintF("%8.4f, %8.4f, %8.4f, %8.4f\n", mxr9150XAxis(),
+            		                                  mxr9150YAxis(),
+                             	                      mxr9150ZAxis(),
+                            	                      voltageMonitor);
             break;
 
         ///////////////////////////////
@@ -602,6 +611,7 @@ void cliCom(void)
 
         case '0': // Disable high speed telemetry
            	highSpeedTelemDisable();
+            logSync();
 
             cliQuery = 'x';
            	break;
@@ -803,7 +813,9 @@ void cliCom(void)
 
         ///////////////////////////////
 
-        case 'U': // Not Used
+        case 'U': // EEPROM CLI
+            eepromCLI();
+
             cliQuery = 'x';
          	validCliCommand = false;
          	break;
@@ -886,7 +898,7 @@ void cliCom(void)
    		    cliPrint("'r' Mode States                            'R' Reset and Enter Bootloader\n");
    		    cliPrint("'s' Raw Receiver Commands                  'S' Reset\n");
    		    cliPrint("'t' Processed Receiver Commands            'T' Not Used\n");
-   		    cliPrint("'u' Command In Detent Discretes            'U' Not Used\n");
+   		    cliPrint("'u' Command In Detent Discretes            'U' EEPROM CLI\n");
    		    cliPrint("'v' Motor PWM Outputs                      'V' Reset EEPROM Parameters\n");
    		    cliPrint("'w' Servo PWM Outputs                      'W' Write EEPROM Parameters\n");
    		    cliPrint("'x' Terminate Serial Communication         'X' Not Used\n");

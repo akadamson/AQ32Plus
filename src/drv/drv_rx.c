@@ -79,6 +79,11 @@ static TIM_ICInitTypeDef  TIM_ICInitStructure;
 
 #define SPEKTRUM_FRAME_SIZE 16
 
+enum frameWatchDogConsts {
+  frameResetTime = 4 , // 4ms
+  frameLostTime = 1000, // 1 second.
+  };
+
 uint8_t  i;
 uint8_t  spektrumBindCount;
 
@@ -225,21 +230,36 @@ void TIM1_CC_IRQHandler(void)
 //  Spektrum Satellite Receiver UART Interrupt Handler
 ///////////////////////////////////////////////////////////////////////////////
 
+void rxFrameLost()
+{
+    evrPush(EVR_RxFrameLost,0);
+
+    // Maybe do something more interesting like auto-descent or hover-hold.
+    // armed = false;
+}
+
+///////////////////////////////////////
+
+void rxFrameReset()
+{
+  spektrumFramePosition = 0;
+}
+
+///////////////////////////////////////
+
+uint32_t frameReset;
+uint32_t frameLost;
+
 void USART3_IRQHandler(void)
 {
     uint8_t  b;
     uint8_t  spektrumChannel;
-    uint32_t spektrumTime;
 
     if (USART_GetITStatus(USART3, USART_IT_RXNE) == SET)
     {
-        rcActive             = true;
-        spektrumTime         = micros();
-        spektrumTimeInterval = spektrumTime - spektrumTimeLast;
-        spektrumTimeLast     = spektrumTime;
+        rcActive = true;
 
-        if (spektrumTimeInterval > 5000)
-            spektrumFramePosition = 0;
+        watchDogReset(frameReset);
 
         spektrumFrame[spektrumFramePosition] = USART_ReceiveData(USART3);
 
@@ -255,6 +275,7 @@ void USART3_IRQHandler(void)
 
         if (spektrumFrameComplete)
 		{
+		    watchDogReset(frameLost);
 		    for (b = 3; b < SPEKTRUM_FRAME_SIZE; b += 2)
 		    {
 		        spektrumChannel = 0x0F & (spektrumFrame[b - 1] >> spektrumChannelShift);
@@ -480,6 +501,9 @@ void rxInit(void)
 		}
 
         ///////////////////////////////
+
+	    watchDogRegister(&frameReset, frameResetTime, rxFrameReset, true );
+	    watchDogRegister(&frameLost,  frameLostTime,  rxFrameLost,  true );
 	}
 
 	///////////////////////////////////
@@ -502,7 +526,7 @@ uint16_t rxRead(uint8_t channel)
        	else
        	{
        	    if (eepromConfig.spektrumHires)
-       	        data = 1000 + spektrumChannelData[channel];         // 2048 mode
+       	        data = 2000 + spektrumChannelData[channel];         // 2048 mode
        	    else
        	        data = (1000 + spektrumChannelData[channel]) << 1;  // 1024 mode
        	}
@@ -521,7 +545,7 @@ uint16_t rxRead(uint8_t channel)
 void checkSpektrumBind()
 {
     // Spektrum Satellite RX Input
-  	// USART1 RX PA10
+  	// USART3 RX PD9
 	// Spektrum Satellite Bind Input
 	// PE14
 
